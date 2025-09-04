@@ -5,8 +5,6 @@ sys.path.append('/Users/mjrs/Library/CloudStorage/OneDrive-Pessoal/UFG/Projeto_V
 
 # %%
 import os
-#import sys
-#sys.path.append('/Users/mjrs/Library/CloudStorage/OneDrive-Pessoal/UFG/Projeto_VIDAEPAUTA/Códigos/ILPI')
 import re
 import pandas as pd
 import matplotlib
@@ -122,7 +120,7 @@ plot_barh(gender.set_index('institution_name'),
 
 ## --------------------
 ## ---- 2 - Idade 
-## -------------------
+## --------------------
 
 # Cria um DataFrame para a idade dos residentes
 df_idade = df[['institution_name', 'elder_age']]
@@ -130,6 +128,13 @@ df_idade = df[['institution_name', 'elder_age']]
 # Filtra apenas as linhas com idade dos residentes
 df_idade = df_idade[df_idade['elder_age'].notna()].astype({'elder_age': 'int64'})
 df_idade.head()
+# %%
+# Criando tabela de residentes para data lake
+residentes_ILPI = df[['institution_name', 'record_id', 'cpf', 'full_name', 'date_of_birth', 'elder_age', 'sex', 'race']]
+residentes_ILPI = residentes_ILPI[residentes_ILPI['elder_age'].notna()].astype({'elder_age': 'int64'})
+
+# Salvando tabela residentes_ILPI
+residentes_ILPI.to_csv('../../../../data/SMSAp/lake/Residente.csv')
 # %%
 ## ----- Plotando a idade dos residentes com linha de média
 # Calcula a média geral
@@ -433,30 +438,6 @@ plot_bar_flex_unificado(
     col_valor='total'
 
 )
-
-## %%
-#
-#plot_bar_flex_auto(df_escolaridade_grouped,
-#                   col_categoria='scholarship',
-#                   col_valor='total',
-#                   #col_grupo='institution_name',
-#                   value_format='absolute',  # Texto em %
-#                   orientation='v',
-#                   title='Escolaridade Geral dos Residentes',
-#                   xlabel='Tempo de estudo', ylabel='Número de Residentes',
-#                   filename='../plots/04_grafico_escolaridade_residente_por_ILPI.png',
-#                   show_text=False)
-#
-#plot_bar_flex_auto(df_escolaridade_grouped,
-#                   col_categoria='scholarship',
-#                   col_valor='total',
-#                   #col_grupo='institution_name',
-#                   value_format='percent',  # Texto em %
-#                   orientation='v',
-#                   title='Escolaridade Geral dos Residentes',
-#                   xlabel='Tempo de estudo', ylabel='Número de Residentes',
-#                   filename='../plots/04_grafico_escolaridade_residente_por_ILPI_percentual.png',
-#                   show_text=False)
 # %%
 # Cria um Data Frame escolaridade por ILPI
 df_escolar_inst = df_escolaridade.groupby(['institution_name', 'scholarship']).size().reset_index(name='total')
@@ -489,7 +470,7 @@ salvar_tabela_como_imagem(
 # Criando gráfico escolaridade por ILPI absoluto
 plot_bar_flex_unificado(
     df_escolar_inst,
-    title='Distribuíção por escolaridade por instituição',
+    title='Distribuíção por escolaridade por ILPI (absoluto e %)',
     xlabel='ILPI', ylabel='Número de residentes',
     filename='../plots/04_grafico_escolaridade_por_ILPI_absoluto.png',
     show_text=False,
@@ -500,34 +481,6 @@ plot_bar_flex_unificado(
     col_valor='total'
 
 )
-## %%
-## Criando gráfico escolaridade por ILPI absoluto
-#plot_bar_flex_unificado(df_escolar_inst,
-#                        col_categoria='institution_name',
-#                        col_valor='total',
-#                        col_grupo='escolaridade',
-#                        title='Distribuíção por escolaridade por instituição',
-#                        xlabel='Tempo de estudo', ylabel='Número de residentes',
-#                        filename='../plots/04_grafico_escolaridade_por_ILPI_absoluto.png',
-#                        orientation='v',
-#                        value_format='absolute',
-#                        show_values=True,
-#                        show_text=False
-#)
-## %%
-## Criando gráfico escolaridade por ILPI absoluto
-#plot_bar_flex_unificado(df_escolar_inst,
-#                        col_categoria='institution_name',
-#                        col_valor='total',
-#                        col_grupo='escolaridade',
-#                        title='Distribuíção percentual por escolaridade por instituição',
-#                        xlabel='Tempo de estudo', ylabel='Número de residentes',
-#                        filename='../plots/04_grafico_proporcao_escolaridade_por_ILPI.png',
-#                        orientation='v',
-#                        value_format='percent',
-#                        show_values=True,
-#                        show_text=False
-#)
 # %%
 
 ## --------------------
@@ -545,6 +498,14 @@ temp_instit.head()
 # Filtra apenas as linhas com tempo de institucionalização
 temp_instit = temp_instit[temp_instit['institut_time_years'].notna()].astype({'institut_time_years':'int64'})
 temp_instit.head()
+# %%
+# Cria tabela Tempo Institucionalizado
+tempo_instit_residentes = df[['institution_name', 'cpf', 'institut_time_years']]
+tempo_instit_residentes = (tempo_instit_residentes[tempo_instit_residentes['institut_time_years']
+                                                   .notna()]
+                                                   .astype({'institut_time_years': 'int64'}))
+# Salva a tabela para uso no data lake
+tempo_instit_residentes.to_csv('../../../../data/SMSAp/Lake/TempoInstituicao.csv')
 # %%
 # Agrupa por 'institut_time_years', usa .size() para contar quantas vezes cada escolaridade aparece e
 # renomeia a coluna de contagem para 'total'
@@ -577,35 +538,6 @@ plot_bar_flex_unificado(
     col_valor='total'
 
 )
-# %%
-## Configura o tamanho do gráfico
-#plot_bar_flex_auto(temp_instit_grouped,
-#                        #col_categoria='institution_name',
-#                        col_valor='total',
-#                        #col_grupo='institut_time_years',
-#                        title='Tempo de Institucionalização dos Residentes',
-#                        xlabel='Tempo de instituíção', ylabel='Número de residentes',
-#                        filename='../plots/05_grafico_tempo_instit.png',
-#                        orientation='v',
-#                        value_format='absolute',
-#                        show_values=True,
-#                        show_text=False
-#)
-#
-## Criando gráfico tempo institucionalização por ILPI absoluto
-#plot_bar_flex_auto(temp_instit_grouped,
-#                        #col_categoria='institution_name',
-#                        col_valor='total',
-#                        #col_grupo='institut_time_years',
-#                        title='Tempo de Institucionalização dos Residentes Percentual',
-#                        xlabel='Tempo de instituíção', ylabel='Número de residentes',
-#                        filename='../plots/05_grafico_proporcao_tempo_instit.png',
-#                        orientation='v',
-#                        value_format='percent',
-#                        show_values=True,
-#                        show_text=False
-#)
-
 # %%
 # Criando faixas de tempo 
 # Define os intervalos tempo instituíção para as categorias
@@ -696,6 +628,17 @@ suporte.head(20)
 suporte_gruped = suporte[suporte['family_support'].notna()].astype({'family_support':'int64'})
 suporte_gruped.head(20)
 # %%
+# Cria tabela Suporte Familiar para data lake
+suporte_familiar_residente = df[['institution_name', 'cpf', 'family_support']]
+suporte_familiar_residente = (suporte_familiar_residente[suporte_familiar_residente['family_support']
+                                                         .notna()]
+                                                         .astype({'family_support': 'int64'})
+)
+
+# Salva a tabela para data lake
+suporte_familiar_residente.to_csv('../../../../data/SMSAp/lake/SuporteFamiliar.csv')
+
+# %%
 # Agrupa por 'family_support', usa .size() para contar quantas vezes cada suporte aparece e
 # renomeia a coluna de contagem para 'total'
 suporte_gruped = suporte.groupby('family_support').size().reset_index(name='total')
@@ -782,7 +725,7 @@ plot_bar_flex_unificado(
 # Gráfico Suporte familiar por ILPI percentagem
 plot_bar_flex_unificado(
     suporte_inst,
-    title='Frequência do Suporte Familiar dos Residentes por ILPI',
+    title='Frequência do Suporte Familiar dos Residentes por ILPI (%)',
     xlabel='', ylabel='Número de residentes',
     filename='../plots/06_grafico_suporte_familiar_por_ILPI_percent.png',
     orientation='v',
@@ -804,6 +747,18 @@ grau_dependencia.head(20)
 # Filtra apenas as linhas que existam dados de grau_dependencia
 grau_dependencia_gruped = grau_dependencia[grau_dependencia['dependence_degree'].notna()].astype({'dependence_degree':'int64'})
 grau_dependencia_gruped.head(20)
+# %%
+# Cria tabela Grau Dependencia para o data lake
+
+grau_dependencia_residente = df[['institution_name', 'cpf', 'dependence_degree']]
+grau_dependencia_residente = (grau_dependencia_residente[grau_dependencia_residente['dependence_degree']
+                                                         .notna()]
+                                                         .astype({'dependence_degree': 'int64'})
+)
+
+# Salva a tabela
+grau_dependencia_residente.to_csv('../../../../data/SMSAp/Lake/GrauDependencia.csv')
+
 #%%
 # Agrupa por 'dependence_degree', usa .size() para contar quantas vezes cada grau_dependencia aparece e
 # renomeia a coluna de contagem para 'total'
@@ -957,7 +912,7 @@ plot_bar_flex_unificado(
     vinculo_inst,
     title='Frequência do Tipo de Vínculo dos Residentes com a ILPI',
     xlabel='', ylabel='Número de residentes',
-    filename='../plots/08_grafico_vinculo_por_ILPI.png',
+    filename='../plots/08_grafico_tipo_vinculo_por_ILPI.png',
     orientation='v',
     value_format='absolute',
     show_values=True,
@@ -969,9 +924,9 @@ plot_bar_flex_unificado(
 # Gráfico vinculo familiar por ILPI percentagem
 plot_bar_flex_unificado(
     vinculo_inst,
-    title='Frequência do vinculo Familiar dos Residentes por ILPI',
+    title='Frequência do vinculo Familiar dos Residentes por ILPI (%)',
     xlabel='', ylabel='Número de residentes',
-    filename='../plots/08_grafico_vinculo_familiar_por_ILPI_percent.png',
+    filename='../plots/08_grafico_tipo_vinculo_por_ILPI_percent.png',
     orientation='v',
     value_format='percent',
     show_values=True,
@@ -1187,10 +1142,20 @@ plot_bar_flex_unificado(
 medic_por_residente = extrair_medicamentos(df)
 medic_por_residente.head(20)
 # %%
-# # Agrupa por 'ILPI' e 'lelder_income_source', usa .size() para contar quantas vezes cada suporte aparece e
+# # Agrupa por 'ILPI'', usa .size() para contar quantas vezes cada suporte aparece e
 # renomeia a coluna de contagem para 'total'
-contagem_medic_por_residente = medic_por_residente.groupby(['ILPI','CPF','Nome Completo']).size().reset_index(name='total')
+contagem_medic_por_residente = medic_por_residente.groupby(['ILPI','CPF','Nome Completo']).size().reset_index(name='Qtde Medicamentos')
 contagem_medic_por_residente.head(20)
+# %%
+# Cria a tabela Contagem Medicamentos para o data lake
+
+contagem_medicamento_residente = contagem_medic_por_residente[['ILPI', 'CPF', 'Qtde Medicamentos']]
+contagem_medicamento_residente = (contagem_medicamento_residente
+                                  .rename(columns={'ILPI': 'institution_name', 'CPF': 'cpf', 'Qtde Medicamentos': 'tot_medicin'})
+)
+
+# Salva a tabela
+contagem_medicamento_residente.to_csv('../../../../data/SMSAp/lake/QtdeMedicamentos.csv')
 
 # %%
 ## --------------------
@@ -1221,13 +1186,130 @@ morb_dict = {
 }
 
 # %%
+
+########
+
+def extrair_morbidades(df, morbidade_dict, nome_coluna_soma=None):
+    """
+    Filtra e retorna os dados de morbidades legíveis, agrupados por institution_name, full_name, cpf.
+    A coluna 'other_morbidities' é normalizada (minúsculas, sem espaços),
+    separando múltiplas entradas por vírgula, ponto e vírgula ou barra vertical.
+    Soma final inclui morbidades binárias + textuais distintas.
+
+    Parâmetros:
+    - df: DataFrame.
+    - morbidade_dict: dict, mapeamento de código -> texto.
+    - nome_coluna_soma: str, nome da coluna soma (Se None, usa 'soma_morbidities').
+
+    Retorna:
+    - DataFrame com as morbidades processadas, incluindo:
+      - 'Morbidades': lista de morbidades binárias e textuais.
+      - 'other_morbidities': morbidades textuais normalizadas.
+      - 'soma_morbidities': soma total de morbidades (binárias + textuais).
+    """
+    
+    morbidities_cols = list(morbidade_dict.keys())
+    campos_para_propagacao = ['institution_name', 'full_name', 'cpf', 'elder_age']  # Incluir 'elder_age'
+    
+    # Propaga os campos chave
+    for campo in campos_para_propagacao:
+        df[campo] = df[campo].ffill()
+
+    # Inclui linhas que tenham morbidades binárias OU outras textuais
+    df_filtrado = df[df[morbidities_cols].eq(1).any(axis=1) | df['other_morbidities'].notna()].copy()
+
+    if nome_coluna_soma is None:
+        nome_coluna_soma = 'soma_morbidities'
+
+    # Soma das morbidades binárias
+    df_filtrado['soma_binarias'] = df_filtrado[morbidities_cols].sum(axis=1, numeric_only=True)
+
+    def nomes_morbidades(row):
+        return ', '.join([morbidade_dict[col] for col in morbidities_cols if row.get(col) == 1])
+
+    df_filtrado['Morbidades'] = df_filtrado.apply(nomes_morbidades, axis=1)
+
+    # Padroniza a coluna 'other_morbidities' (primeira letra maiúscula)
+    df_filtrado['other_morbidities'] = (
+        df_filtrado['other_morbidities']
+        .astype(str)  # Garante que todos os valores sejam strings
+        .str.lower()  # Coloca em minúsculas
+        .replace('nan', '')  # Remove 'nan' (caso existam valores inválidos)
+        .str.strip()  # Remove espaços extras
+        .str.capitalize()  # Coloca a primeira letra maiúscula
+    )
+    
+    # Remove qualquer vírgula extra no início ou no final
+    df_filtrado['other_morbidities'] = df_filtrado['other_morbidities'].str.lstrip(', ').str.rstrip(', ')
+
+    # Função para contar morbidades textuais
+    def contar_textuais(texto):
+        if not texto:
+            return 0
+        
+        # Substitui " e " (com espaços) por vírgula para separar corretamente as palavras
+        texto = re.sub(r'\s+e\s+', ', ', texto)
+        
+        # Substitui ponto e vírgula por vírgula
+        texto = texto.replace(';', ',')
+        
+        # Divide a string usando vírgula, ponto e vírgula ou barra vertical como separadores
+        itens = re.split(r'[;,|]', texto)
+        
+        # Remove espaços extras e conta as palavras
+        itens = [item.strip() for item in itens if item.strip()]
+        
+        return len(itens)
+
+    # Aplica a função para contar as morbidades textuais
+    df_filtrado['soma_other'] = df_filtrado['other_morbidities'].apply(contar_textuais)
+    
+    # Soma final das morbidades (binárias + textuais)
+    df_filtrado[nome_coluna_soma] = df_filtrado['soma_binarias'] + df_filtrado['soma_other']
+    
+    # Converte para int64 para garantir que a coluna soma seja do tipo inteiro
+    df_filtrado[nome_coluna_soma] = df_filtrado[nome_coluna_soma].fillna(0).astype('int64')
+
+    # Limpa colunas auxiliares
+    df_filtrado = df_filtrado.drop(columns=['soma_binarias', 'soma_other'])
+
+    # Agrupamento
+    df_resultado = df_filtrado.groupby(['institution_name', 'full_name', 'cpf'], as_index=False).agg({
+        'Morbidades': lambda x: ', '.join(sorted(set(', '.join(x).split(', ')))),
+        'other_morbidities': lambda x: ', '.join(sorted(set(filter(None, map(str.strip, x))))),
+        nome_coluna_soma: 'sum',  # Usando a soma do campo 'soma_morbidities' customizado
+        'elder_age': 'first'  # Garantir que 'elder_age' seja agregada
+    })
+
+    # Converte 'elder_age' para int64
+    df_resultado['elder_age'] = df_resultado['elder_age'].fillna(0).astype('int64')
+
+    # Ordena as colunas conforme solicitado
+    df_resultado = df_resultado[['institution_name', 'full_name', 'elder_age', 'cpf', 'Morbidades', 'other_morbidities', nome_coluna_soma]]
+
+    # Organiza as linhas
+    df_resultado = df_resultado.sort_values(by=['institution_name', 'full_name', 'cpf'])
+
+    return df_resultado
+
+
+
+
+
 # Extraindo morbidades, outras morbidades e soma
 df_morbidades = extrair_morbidades(df, morb_dict)
-# Exibindo o DataFrame resultante   
+
 df_morbidades
 # %%
+# Cria a tabela Morbidade Residentes para data lake
+morbidades_residentes = df_morbidades[['institution_name', 'cpf', 'Morbidades', 'other_morbidities', 'soma_morbidities']]
+
+# Salva tabela
+morbidades_residentes.to_csv('../../../../data/SMSAp/Lake/Morbidades.csv')
+
+# %%
 ## ------------------------
-## ----- 12 - Estado de Sáude 
+## ----- 12 - Estado de Saúde 
 ## ------------------------
 # Cria um DataFrame para a estado_saude dos residentes
 estado_saude = df[['institution_name', 'health_condition']]
@@ -1236,6 +1318,16 @@ estado_saude.head()
 # Filtra apenas as linhas com estado_saude dos residentes
 estado_saude = estado_saude[estado_saude['health_condition'].notna()].astype({'health_condition': 'int64'})
 estado_saude.head()
+# %%
+# Cria a tabela Estado Saúde para data lake
+estado_saude_residente = df[['institution_name', 'cpf', 'health_condition']]
+estado_saude_residente = (estado_saude_residente[estado_saude_residente['health_condition']
+                                                 .notna()]
+                                                 .astype({'health_condition': 'int64'})
+)
+
+# Salva tabela
+estado_saude_residente.to_csv('../../../../data/SMSAp/Lake/EstadoSaude.csv')
 # %%
 # Agrupa por 'health_condition, usa .size() para contar quantas vezes cada estado_saude aparece e
 # renomeia a coluna de contagem para 'total'
@@ -1448,7 +1540,13 @@ comp_fragilidade
 
 # %%
 # Fazendo o merge tabelas
-df['dependence_degree']
+# *****************.   PRECISA VERIFICAR AS TABELAS MERGE *************************
+# Agrupar tabelas de interesse 
+
+#df_score = df_morbidades(contagem_medic_por_residente, how='rigth')
+# %%
+df_score = df_morbidades.merge(comp_fragilidade, how='right')
+df_score
 
 # %%
 #amount_weight_loss_dict ={1: "de 1 a 3 kg",2: "mais de 3 kg",}
@@ -1459,66 +1557,62 @@ df['dependence_degree']
 #basic_activities_diffic_dict = 	{1:	"Sim",2: "Não"}	
 #falls_number_dict = {1: " nenhuma", 2: "1 a 3 quedas", 3: "4 e mais",}
 
-
-#condicao_atencao = {
-#    'amount_weight_loss':(lambda x: x == 1),
-#    'elder_strenght':(lambda x: x == 2),
-#    'elder_hospitalized':(lambda x: x ==1),
-#    'elder_difficulties':(lambda x: x == 1),
-#    'elder_mobility':(lambda x: x == 2),
-#    'basic_activities_diffic':(lambda x: x ==1),
-#    'falls_number':(lambda x: x ==1)
-#}
-#
-#condicao_alerta = {
-#    'amount_weight_loss':(lambda x: x == 1),
-#    'elder_strenght':(lambda x: x == 1),
-#    'elder_hospitalized':(lambda x: x in [2, 3] ),
-#    'elder_difficulties':(lambda x: x == 2),
-#    'elder_mobility':(lambda x: x == 1),
-#    'basic_activities_diffic':(lambda x: x == 1),
-#    'falls_number':(lambda x: x == 2)
-#}
-#
-#condicao_critica = {
-#    'amount_weight_loss':(lambda x: x == 2),
-#    'elder_strenght':(lambda x: x == 1),
-#    'elder_hospitalized':(lambda x: x in [3, 4]),
-#    'elder_difficulties':(lambda x: x == 1),
-#    'elder_mobility':(lambda x: x == 1),
-#    'basic_activities_diffic':(lambda x: x ==1),
-#    'falls_number':(lambda x: x == 3)
-#}
-# %%
-# Agrupar tabelas de interesse
-
-df_score = df_morbidades.merge(comp_fragilidade, how='right')
-df_score
-
-# %%
-df_idade.head()
-# %%
-
+##*********************. EXEMPLO NECESSITA DEFINIR OS PARAMETROS  ************************
 condicao_atencao = {
-    'elder_age': (lambda x: x < 70),
-    'soma_mobidities': (lambda x: x <= 3),
-    'soma_fragilidades': (lambda x: x in [2, 3]),
-
+    'amount_weight_loss':(lambda x: x == 1),
+    'elder_strenght':(lambda x: x == 2),
+    'elder_hospitalized':(lambda x: x ==1),
+    'elder_difficulties':(lambda x: x == 1),
+    'elder_mobility':(lambda x: x == 2),
+    'basic_activities_diffic':(lambda x: x ==1),
+    'falls_number':(lambda x: x ==1)
 }
 
 condicao_alerta = {
-    'elder_age': (lambda x: x > 70 & x < 80),
-    'soma_mobidities': (lambda x: x in [4, 5] ),
-    'soma_fragilidades': (lambda x: x in [3, 4]),
-    
+    'amount_weight_loss':(lambda x: x == 1),
+    'elder_strenght':(lambda x: x == 1),
+    'elder_hospitalized':(lambda x: x in [2, 3] ),
+    'elder_difficulties':(lambda x: x == 2),
+    'elder_mobility':(lambda x: x == 1),
+    'basic_activities_diffic':(lambda x: x == 1),
+    'falls_number':(lambda x: x == 2)
 }
 
 condicao_critica = {
-    'elder_age': (lambda x: x >= 81),
-    'soma_mobidities': (lambda x: x >= 6),
-    'soma_fragilidades': (lambda x: x>= 4),
-    
+    'amount_weight_loss':(lambda x: x == 2),
+    'elder_strenght':(lambda x: x == 1),
+    'elder_hospitalized':(lambda x: x in [3, 4]),
+    'elder_difficulties':(lambda x: x == 1),
+    'elder_mobility':(lambda x: x == 1),
+    'basic_activities_diffic':(lambda x: x ==1),
+    'falls_number':(lambda x: x == 3)
 }
+
+# %%
+
+
+# %%
+
+#condicao_atencao = {
+#    'elder_age': (lambda x: x < 70),
+#    'soma_morbidities': (lambda x: x <= 3),
+#    'soma_fragilidades': (lambda x: x in [2, 3]),
+#
+#}
+#
+#condicao_alerta = {
+#    'elder_age': (lambda x: x > 70 & x < 80),
+#    'soma_morbidities': (lambda x: x in [4, 5] ),
+#    'soma_fragilidades': (lambda x: x in [3, 4]),
+#    
+#}
+#
+#condicao_critica = {
+#    'elder_age': (lambda x: x >= 81),
+#    'soma_morbidities': (lambda x: x >= 6),
+#    'soma_fragilidades': (lambda x: x>= 4),
+#    
+#}
 
 # %%
 resultado, resumo = classificar_risco(df, condicao_critica, condicao_alerta, condicao_atencao)
@@ -1543,7 +1637,4 @@ salvar_tabela_como_imagem(
 df.head()
 # %%
 
- 
-# %%
 
-# %%

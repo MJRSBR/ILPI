@@ -8,7 +8,7 @@ import pandas as pd
 # Leitura dos dados
 # ---------------------
 
-df = pd.read_excel('../../../data/SMSAp/UPA/superutilizados_internacoes.xlsx', sheet_name = 'BANCO DE DADOS SIHD GERAL 2024')
+df = pd.read_excel('../../../data/SMSAp/Internacao/superutilizados_internacoes.xlsx', sheet_name = 'BANCO DE DADOS SIHD GERAL 2024')
 df
 # %%
 # ---------------------
@@ -38,5 +38,5 @@ df_60
 # Gerando arquivo .csv para futuras análises
 # ---------------------
 
-df_60.to_csv('../../../data/SMSAp/UPA/dados_internacoes_60+.csv')
+df_60.to_csv('../../../data/SMSAp/Internacao/dados_internacoes_60+.csv')
 # %%

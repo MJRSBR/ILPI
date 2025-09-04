@@ -1,6 +1,15 @@
 # %%
 import pandas as pd
+import uuid
 # %%
+## ----------------------
+## Função para gerar UUIDv5 a partir do CPF
+## ______________________
+
+def gerar_uuid_v5(cpf):
+    namespace = uuid.NAMESPACE_DNS # usando namespace padrão
+    return uuid.uuid5(namespace, cpf)
+
 ## ----------------------
 ## Função para facilitar a análise baseada em CPF, considerando que o DF tem colunas vazias ou NA.
 ## ----------------------
@@ -37,13 +46,9 @@ def etl_df_redcap(df, campos_chave, campo_discriminador='institution_name'):
     df.drop(columns=['_grupo'], inplace=True)
    
     return df
-# %%
-# Ajustar a exibição do pandas para mostrar mais caracteres
-#pd.set_option('display.max_rows', None) #para mostrar todas as linhas. 
-#
-#pd.set_option('display.max_colwidth', None)  # Permite exibir a coluna inteira
-# %%
 
+# %%
+# Lendo o arquivo .csv do REDCap
 df = pd.read_csv("../../../../data/SMSAp/ILPI/PerfilEpidemiolgicos_DATA_2025-07-24_1004.csv",
                  sep=";")
 df.head()
@@ -94,8 +99,14 @@ cols_to_drop = ['redcap_survey_identifier', 'identificao_da_ilpi_f650_timestamp'
 df_filtered = df_corrigido.drop(columns=cols_to_drop)
 
 # %%
+# Gerando o UUIDv5 paracada CPF no DataFrame utilizando apply
+
+df_filtered['uuidv5'] = df_filtered['cpf'].apply(lambda cpf: gerar_uuid_v5(cpf))
+df_filtered
+
+# %%
 ## - Reordenando as colunas 
-df_final = df_filtered[['record_id', 'redcap_repeat_instrument', 'redcap_repeat_instance', 'visit_date', 
+df_final = df_filtered[['uuidv5', 'record_id', 'redcap_repeat_instrument', 'redcap_repeat_instance', 'visit_date', 
                         'latitude', 'longitude', 'institution_name', 'cpf', 'full_name', 'sex', 'date_of_birth', 
                         'elder_age', 'race', 'scholarship', 'institut_time_years', 'time_months', 'institut_time_months', 
                         'family_support', 'dependence_degree', 'link_type___1', 'link_type___2', 'link_type___3', 
@@ -111,6 +122,7 @@ df_final = df_filtered[['record_id', 'redcap_repeat_instrument', 'redcap_repeat_
                         'physical_desabilities___3', 'weight_loss', 'amount_weight_loss', 'elder_strenght', 'elder_hospitalized', 
                         'elder_difficulties', 'elder_mobility', 'basic_activities_diffic', 'falls_number', 'interviewer_name']]
                         
+df_final.rename(columns={'scholarship':'education'})
 df_final
 
 # %%
@@ -120,10 +132,10 @@ df_final.to_csv("../../../../data/SMSAp/ILPI/base_perfil_epidemiologico.csv",
                    sep=";")
 # %%
 
-#df_medicamentos = df[df['redcap_repeat_instrument'] == 'medicamentos_em_uso'].copy()
+df_final['family_support'].dtype
+
+
+
+
 
 # %%
-
-
-
-
