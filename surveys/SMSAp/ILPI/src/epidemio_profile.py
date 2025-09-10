@@ -73,7 +73,9 @@ gender = df_filtered.groupby(['institution_name', 'sex']).size().unstack(fill_va
 # Remove o nome do eixo de colunas
 gender.columns.name = None
 gender
+# %%
 
+df_filtered["sex"]
 # %%
 # Calcula a porcentagem de cada sexo por instituição
 gender_prop = (round(gender[['Feminino', 'Masculino']]
@@ -128,13 +130,6 @@ df_idade = df[['institution_name', 'elder_age']]
 # Filtra apenas as linhas com idade dos residentes
 df_idade = df_idade[df_idade['elder_age'].notna()].astype({'elder_age': 'int64'})
 df_idade.head()
-# %%
-# Criando tabela de residentes para data lake
-residentes_ILPI = df[['institution_name', 'record_id', 'cpf', 'full_name', 'date_of_birth', 'elder_age', 'sex', 'race']]
-residentes_ILPI = residentes_ILPI[residentes_ILPI['elder_age'].notna()].astype({'elder_age': 'int64'})
-
-# Salvando tabela residentes_ILPI
-residentes_ILPI.to_csv('../../../../data/SMSAp/lake/Residente.csv')
 # %%
 ## ----- Plotando a idade dos residentes com linha de média
 # Calcula a média geral
