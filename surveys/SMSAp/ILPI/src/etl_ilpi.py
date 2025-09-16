@@ -55,11 +55,11 @@ def preparar_dados_residentes(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFr
     try:
         # --- Configurações iniciais ---
         colunas_necessarias = [
-            "institution_name", "record_id", "uuidv5",
+            "id_institution", "institution_name", "record_id", "uuidv5",
             "full_name", "date_of_birth", "elder_age", "sex", 
-            "race", "education",
+            "race", "education"
         ]
-        colunas_numericas = ["elder_age", "sex", "race", "education"]
+        colunas_numericas = [ "id_institution", "record_id", "elder_age", "sex", "race"]
         chave_duplicidade = ["uuidv5"]
 
         def validar_colunas(df: pd.DataFrame, colunas: list[str]) -> None:
@@ -107,6 +107,8 @@ def preparar_dados_residentes(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFr
 # --------------------
 # Funções de processamento
 # --------------------
+
+# AJUSTAR#################################################
 
 def limpar_e_converter_colunas(df: pd.DataFrame, colunas_tipos: dict) -> pd.DataFrame:
     """
@@ -242,13 +244,24 @@ df_final = df_final.rename(columns={"scholarship":"education"})
 df_final
 
 # %%
+df_ilpi = df_final.copy()
 
+df_ilpi.rename(columns={"institution_name":"id_institution"}, inplace=True)
 
-df_final.to_csv("../../../../data/SMSAp/ILPI/base_perfil_epidemiologico.csv",
-                   index=False,
-                   sep=";")
+ilpi_map = {
+    1: "Associaçao Solar das Acácias",
+    2: "Abrigo Comendador Walmor",
+    3: "Abrigo Aconchego Dona Norma",
+    4: "Associação Núcleo Espírita Amigos para Sempre",
+    5: "Casa Silvestre Linhares"
+}
+
+df_ilpi["institution_name"] = df_ilpi['id_institution'].map(ilpi_map)
+df_ilpi
+
 # %%
 
-df_final["education"]
-
+df_ilpi.to_csv("../../../../data/SMSAp/ILPI/base_perfil_epidemiologico.csv",
+                   index=False,
+                   sep=";")
 # %%

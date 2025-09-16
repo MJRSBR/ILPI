@@ -45,7 +45,7 @@ df.head()
 def extrair_comp_fragilidade(df, nome_coluna_soma='soma_fragilidades'):
     """
     Filtra e retorna os dados de componentes de fragilidade,
-    agrupados por institution_name, full_name, cpf.
+    agrupados por id_institution, full_name, uuidv5.
 
     Parâmetros:
     - df: DataFrame.
@@ -59,7 +59,7 @@ def extrair_comp_fragilidade(df, nome_coluna_soma='soma_fragilidades'):
     """
     
     # # Preenche valores ausentes nas colunas-chave com o valor anterior (forward fill)
-    campos_para_propagacao = ['institution_name', 'full_name', 'cpf']
+    campos_para_propagacao = ['id_institution', 'uuidv5', 'full_name']
     for campo in campos_para_propagacao:
         if campo in df.columns:
             df[campo] = df[campo].ffill()
@@ -121,7 +121,7 @@ def extrair_comp_fragilidade(df, nome_coluna_soma='soma_fragilidades'):
         return ', '.join(sorted(componentes))
 
     # Agrupa os dados por indivíduo e instituição e resume os componentes e a soma
-    resultado = df.groupby(['institution_name', 'full_name', 'cpf'], as_index=False).agg({
+    resultado = df.groupby(['id_institution', 'uuidv5', 'full_name'], as_index=False).agg({
         'Componentes de Fragilidade': agrupar_componentes,
         'soma_frag': 'sum'
     })
@@ -131,8 +131,8 @@ def extrair_comp_fragilidade(df, nome_coluna_soma='soma_fragilidades'):
         'soma_frag': nome_coluna_soma
     })
 
-    # Ordena os resultados por instituição, nome e CPF
-    resultado = resultado.sort_values(by=['institution_name', 'full_name', 'cpf'])
+    # Ordena os resultados por instituição, nome e uuidv5
+    resultado = resultado.sort_values(by=['id_institution', 'uuidv5', 'full_name'])
 
     return resultado
 

@@ -1,6 +1,11 @@
 # %%
+import sys
+sys.path.append('/Users/mjrs/Library/CloudStorage/OneDrive-Pessoal/UFG/Projeto_VIDAEPAUTA/Códigos/ILPI')
+import re
 import pandas as pd
 from etl_ilpi import preparar_dados_residentes, limpar_e_converter_colunas
+from funcoes.f_process import extrair_morbidades, extrair_medicamentos, extrair_medicamentos_incluindo_vazios
+# %%
 
 # ---------------------
 # Leitura dos dados
@@ -28,19 +33,21 @@ residentes_ILPI, duplicados_ILPI = preparar_dados_residentes(df)
 duplicados_ILPI
 
 # %%
+residentes_ILPI
+# %%
 # --------------------
 # Converter colunas para a tabela de residentes e salvar no lake
 # --------------------
 
-colunas_para_converter = {
-    "elder_age": int,
-    "sex": int,
-    "race": int,
-    "education": int
-}
-residentes_ILPI = residentes_ILPI[["institution_name", "uuidv5", "full_name", 
+# colunas_para_converter = {
+#     "elder_age": int,
+#     "sex": int,
+#     "race": int,
+#     "education": int
+# }
+residentes_ILPI = residentes_ILPI[["id_institution", "uuidv5", "full_name", 
                                    "elder_age", "date_of_birth", "sex", "race", "education"]]
-residentes_ILPI = limpar_e_converter_colunas(residentes_ILPI, colunas_para_converter)
+#residentes_ILPI = limpar_e_converter_colunas(residentes_ILPI, colunas_para_converter)
 residentes_ILPI
 
 # %%
@@ -57,12 +64,12 @@ colunas_para_converter = {
     "institut_time_years": int,
 }
 
-tempo_instituicao = df[["institution_name", "uuidv5", "institut_time_years"]]
+tempo_instituicao = df[["id_institution", "uuidv5", "institut_time_years"]]
 tempo_instituicao = limpar_e_converter_colunas(tempo_instituicao, colunas_para_converter)
 tempo_instituicao
 # %%
 # Salvando tabela tempo de instituição 
-tempo_instituicao.to_csv("../../../../data/SMSAp/lake/Residente.csv")
+tempo_instituicao.to_csv("../../../../data/SMSAp/lake/TempoInstituicao.csv")
 print("✅Tabela Tempo Instituíção Residentes ILPI foi salva no lake!")
 
 # %%
@@ -74,7 +81,7 @@ colunas_para_converter = {
     "dependence_degree": int
 }
 
-grau_dependencia = df[["institution_name", "uuidv5", "dependence_degree"]]
+grau_dependencia = df[["id_institution", "uuidv5", "dependence_degree"]]
 grau_dependencia = limpar_e_converter_colunas(grau_dependencia, colunas_para_converter)
 grau_dependencia["dependence_degree"] =  grau_dependencia["dependence_degree"].astype(int)
 grau_dependencia
@@ -91,7 +98,7 @@ colunas_para_converter = {
     "health_condition": int
 }
 
-estado_saude = df[["institution_name", "uuidv5", "health_condition"]]
+estado_saude = df[["id_institution", "uuidv5", "health_condition"]]
 estado_saude = limpar_e_converter_colunas(estado_saude, colunas_para_converter)
 estado_saude["health_condition"] =  estado_saude["health_condition"].astype(int)
 estado_saude
@@ -108,7 +115,7 @@ colunas_para_converter = {
     "family_support": int
 }
 
-suporte_familiar = df[["institution_name", "uuidv5", "family_support"]]
+suporte_familiar = df[["id_institution", "uuidv5", "family_support"]]
 suporte_familiar = limpar_e_converter_colunas(suporte_familiar, colunas_para_converter)
 suporte_familiar["family_support"] =  suporte_familiar["family_support"].astype(int)
 suporte_familiar
@@ -120,26 +127,13 @@ print("✅Tabela Grau de dependência foi salva no lake!")
 # --------------------
 # Converter colunas para a tabela ILPI e salvar no lake
 # --------------------
-df_ilpi = df.copy()
 
-df_ilpi.rename(columns={"institution_name":"id_institution"}, inplace=True)
-
-ilpi_map = {
-    1: "Associaçao Solar das Acácias",
-    2: "Abrigo Comendador Walmor",
-    3: "Abrigo Aconchego Dona Norma",
-    4: "Associação Núcleo Espírita Amigos para Sempre",
-    5: "Casa Silvestre Linhares"
-}
-
-df_ilpi["institution_name"] = df_ilpi['id_institution'].map(ilpi_map)
-df_ilpi
-# %%
 colunas_para_converter = {
-    "id_institution": int
+    "latitude": float,	
+    "longitude": float,
 }
 
-ILPI = df_ilpi[["id_institution", "institution_name", "latitude", "longitude"]]
+ILPI = df[["id_institution", "institution_name", "latitude", "longitude"]]
 ILPI = ILPI[ILPI["latitude"].notna()].astype({"latitude":float})
 ILPI = limpar_e_converter_colunas(ILPI, colunas_para_converter)
 ILPI = ILPI.drop_duplicates(subset=["id_institution"]).sort_values(by="id_institution")
@@ -148,4 +142,146 @@ ILPI
 # Salvando tabela grau de dependencia
 ILPI.to_csv("../../../../data/SMSAp/lake/ILPI.csv")
 print("✅Tabela ILPI foi salva no lake!")
+# %%
+# --------------------
+# Converter colunas para a tabela Qtde Medicamentos e salvar no lake
+# --------------------
+
+qtde_medic_vaz = extrair_medicamentos_incluindo_vazios(df)
+qtde_medic_vaz
+
+# %%
+qtde_medic_vaz = extrair_medicamentos(df)
+qtde_medic_vaz["uuidv5"] = qtde_medic_vaz["uuidv5"].str.lower()
+qtde_medic_vaz
+# %%
+qtde_medic_vaz = qtde_medic_vaz.groupby(["id_institution", "uuidv5"]).size().reset_index(name="qtd_medic_vaz")
+qtde_medic_vaz
+# %%
+# Salvando tabela Qtde Medicamento por Residente
+qtde_medic_vaz.to_csv('../../../../data/SMSAp/lake/QtdeMedicTot.csv')
+print("✅Tabela Qtde Medicamento foi salva no lake!")
+# %%
+
+# --------------------
+# Converter colunas para a tabela Morbidades e salvar no lake
+# --------------------
+# Definindo um dicionário para morbidades binárias
+morb_dict = {
+    "morbidities___1" : "Hipertensão Arterial",
+    "morbidities___2" : "Diabetes Mellitus",
+    "morbidities___3" : "Hipercolesterolemia",
+    "morbidities___4" : "Doença na coluna",
+    "morbidities___5" : "Insuficiência cardíaco",
+    "morbidities___6" : "Infarto",
+    "morbidities___7" : "Insuficiência renal",
+    "morbidities___8" : "Câncer",
+    "morbidities___9" : "Enfisema pulmonar",
+    "morbidities___10":	"Asma",
+    "morbidities___11":	"Bronquite",
+    "morbidities___12":	"Transtorno Mental",
+    "morbidities___13":	"Osteoporose",
+    "morbidities___14":	"Artrite",
+    "morbidities___15":	"Demência",
+    "morbidities___16":	"Alzheimer",
+    "morbidities___17":	"Parkinson",
+    "morbidities___18":	"Etilismo",
+    "morbidities___19":	"Tabagismo",
+    "morbidities___20":	"Usuário de drogas",
+}
+
+morb = extrair_morbidades(df, morb_dict)
+morb
+# %%
+morb = morb[["id_institution", "uuidv5", "soma_morbidities"]]
+morb
+# %%
+# Salvando tabela Numero de Morbidades por Residente
+morb.to_csv('../../../../data/SMSAp/lake/NumMorbidades.csv')
+print("✅Tabela Numero de Morbidades foi salva no lake!")
+# %%
+
+# --------------------
+# Converter colunas para a tabela Mobilidade e salvar no lake
+# --------------------
+colunas_para_converter = {
+    "physical_desabilities___1": int,	
+    "physical_desabilities___2": int,
+    "physical_desabilities___3": int,
+    "elder_mobility": int, 
+    "elder_difficulties": int,
+}
+mobility = df[["id_institution", "uuidv5", "physical_desabilities___1",
+               "physical_desabilities___2", "physical_desabilities___3",
+               "elder_mobility", "elder_difficulties", ]]
+mobility = mobility[mobility["elder_mobility"].notna()].astype({"elder_mobility":int})
+mobility = limpar_e_converter_colunas(mobility, colunas_para_converter)
+mobility
+# %%
+# Salvando tabela mobilidade
+mobility.to_csv("../../../../data/SMSAp/lake/Mobility.csv")
+print("✅Tabela ILPI foi salva no lake!")
+
+# %%
+# --------------------
+# Converter colunas para a tabela Nutricional e salvar no lake
+# --------------------
+
+hospitalization = df[["id_institution", "uuidv5", "elder_hospitalized"]]
+hospitalization = hospitalization[hospitalization["elder_hospitalized"].notna()].astype({"elder_hospitalized":int})
+hospitalization
+# %%
+# Salvando tabela Estado Nutricional
+hospitalization.to_csv("../../../../data/SMSAp/lake/Hospitalizacao.csv")
+print("✅Tabela Estado Nutricional foi salva no lake!")
+# %%
+# --------------------
+# Converter colunas para a tabela Quedas e salvar no lake
+# --------------------				
+
+falls = df[["id_institution", "uuidv5", "falls_number"]]
+falls = falls.dropna()
+falls
+# %%
+# Salvando tabela Quedas 
+falls.to_csv("../../../../data/SMSAp/lake/Quedas.csv")
+print("✅Tabela Quedas foi salva no lake!")
+# %%
+# -------------------
+# Indicadores Sociais
+# -------------------
+
+social = df["sex", "race", "elder_income_source", "education", "elder_visitors"]
+
+# %%
+# --------------------
+# Converter colunas para a tabela Nutricional e salvar no lake
+# --------------------
+colunas_para_converter = {
+    "elder_strenght": int,	
+    "weight_loss": int,
+    "amount_weigth_loss": int,
+
+}
+
+nutritional = df[["id_institution", "uuidv5", "elder_strenght", "weight_loss", "amount_weight_loss"]]
+nutritional = nutritional[nutritional["elder_strenght"].notna()].astype({"elder_strenght":int})
+nutritional["amount_weight_loss"] = nutritional["amount_weight_loss"].fillna(0)
+nutritional = limpar_e_converter_colunas(nutritional, colunas_para_converter)
+nutritional
+# %%
+# Salvando tabela Estado Nutricional
+nutritional.to_csv("../../../../data/SMSAp/lake/EstadoNutricional.csv")
+print("✅Tabela Estado Nutricional foi salva no lake!")
+# %%
+# --------------------
+# Converter colunas para a tabela ABVD e salvar no lake
+# --------------------
+
+abvd = df[["id_institution", "uuidv5","basic_activities_diffic"]]
+abvd = abvd[abvd["basic_activities_diffic"].notna()].astype({"basic_activities_diffic":int})
+abvd
+# %%
+# Salvando tabela ABVD
+abvd.to_csv("../../../../data/SMSAp/lake/ABVD.csv")
 # %%
