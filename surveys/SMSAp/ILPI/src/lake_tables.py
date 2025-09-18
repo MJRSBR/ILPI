@@ -251,7 +251,7 @@ print("✅Tabela Quedas foi salva no lake!")
 # Indicadores Sociais
 # -------------------
 
-social = df["sex", "race", "elder_income_source", "education", "elder_visitors"]
+#social = df["sex", "race", "elder_income_source", "education", "elder_visitors"]
 
 # %%
 # --------------------
@@ -260,7 +260,7 @@ social = df["sex", "race", "elder_income_source", "education", "elder_visitors"]
 colunas_para_converter = {
     "elder_strenght": int,	
     "weight_loss": int,
-    "amount_weigth_loss": int,
+    "amount_weight_loss": int,
 
 }
 
@@ -284,4 +284,87 @@ abvd
 # %%
 # Salvando tabela ABVD
 abvd.to_csv("../../../../data/SMSAp/lake/ABVD.csv")
+# %%
+
+# %%
+mpi_table = (
+    residentes_ILPI
+    .merge(morb, how="left", on="uuidv5", suffixes=("_left", "_right"))
+    .merge(qtde_medic_vaz, how="left", on="uuidv5")
+    .merge(grau_dependencia, how="left", on="uuidv5")
+    .merge(abvd, how="left", on="uuidv5")
+    .reset_index(drop=True)
+)
+
+#mpi_table = mpi_table.rename(columns={"id_institution_left": "id_institution"})
+# mpi_table["uuidv5"] = mpi_table["uuidv5"].str.lower()
+# mpi_table = mpi_table.drop()
+# mpi_table
+
+mpi_table.columns
+
+# %%
+
+colunms_to_drop = ["id_institution_right", "id_institution_left", "id_institution_x", "id_institution_y" ]
+
+mpi_table.drop(columns=colunms_to_drop, axis=1, inplace=True)
+
+mpi_table.columns
+
+# %%
+
+# %%
+
+mpi_table_1 = (
+    mpi_table
+    .merge(falls, how="left", on="uuidv5", suffixes=("_left", "_right"))
+    .merge(nutritional, how="left", on="uuidv5")
+    .merge(mobility, how="left", on="uuidv5")
+    # .merge(hospitalization, how="left", on="uuidv5")
+    .reset_index(drop=True)
+)
+
+
+mpi_table_1.columns
+# %%
+
+colunms_to_drop = ['id_institution_x', 'id_institution_y', "id_institution_right"]
+mpi_table_1 = mpi_table_1.rename(columns={"id_institution_left": "id_institution"})
+mpi_table_1.drop(columns=colunms_to_drop, axis=1, inplace=True)
+
+mpi_table_1.columns
+# %%
+mpi_table_final = (
+    mpi_table_1
+    .merge(hospitalization, how="left", on="uuidv5")
+    .merge(tempo_instituicao, how="left", on="uuidv5")
+    .reset_index(drop=True)
+)
+
+mpi_table_final.columns
+# %%
+colunms_to_drop = ["id_institution_x", "id_institution_y"]
+
+mpi_table_final.drop(columns=colunms_to_drop, axis=1, inplace=True)
+mpi_table_final.columns
+
+
+
+# %%
+
+mpi_table_final = mpi_table_final[[
+    "id_institution", "uuidv5", "full_name", "elder_age",
+    "date_of_birth", "sex", "race", "education", "basic_activities_diffic",
+    "physical_desabilities___1", "physical_desabilities___2", 
+    "physical_desabilities___3", "elder_mobility", "elder_difficulties", 
+    "falls_number", "elder_hospitalized", "elder_strenght", "weight_loss", 
+    "amount_weight_loss", "soma_morbidities", "qtd_medic_vaz", "institut_time_years"]]
+
+mpi_table_final
+# %%
+
+mpi_table_final.to_csv("../../../../data/SMSAp/lake/mpiFinal.csv", index=False)
+print("✅Tabela Tabela Final MPI foi salva no lake!")
+# %%
+mpi_table_final.columns
 # %%
