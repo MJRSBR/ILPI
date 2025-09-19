@@ -52,7 +52,7 @@ residentes_ILPI
 
 # %%
 # Salvando tabela residentes_ILPI
-residentes_ILPI.to_csv("../../../../data/SMSAp/lake/Residente.csv")
+residentes_ILPI.to_csv("../../../../data/SMSAp/lake/Residente.csv", index=False)
 print("✅Tabela Residentes ILPI foi salva no lake!")
 
 # %%
@@ -69,7 +69,7 @@ tempo_instituicao = limpar_e_converter_colunas(tempo_instituicao, colunas_para_c
 tempo_instituicao
 # %%
 # Salvando tabela tempo de instituição 
-tempo_instituicao.to_csv("../../../../data/SMSAp/lake/TempoInstituicao.csv")
+tempo_instituicao.to_csv("../../../../data/SMSAp/lake/TempoInstituicao.csv", index=False)
 print("✅Tabela Tempo Instituíção Residentes ILPI foi salva no lake!")
 
 # %%
@@ -87,7 +87,7 @@ grau_dependencia["dependence_degree"] =  grau_dependencia["dependence_degree"].a
 grau_dependencia
 # %%
 # Salvando tabela grau de dependencia
-grau_dependencia.to_csv("../../../../data/SMSAp/lake/GrauDependencia.csv")
+grau_dependencia.to_csv("../../../../data/SMSAp/lake/GrauDependencia.csv", index=False)
 print("✅Tabela Grau de dependência foi salva no lake!")
 # %%
 # --------------------
@@ -104,7 +104,7 @@ estado_saude["health_condition"] =  estado_saude["health_condition"].astype(int)
 estado_saude
 # %%
 # Salvando tabela grau de dependencia
-estado_saude.to_csv("../../../../data/SMSAp/lake/EstadoSaude.csv")
+estado_saude.to_csv("../../../../data/SMSAp/lake/EstadoSaude.csv", index=False)
 print("✅Tabela Grau de dependência foi salva no lake!")
 # %%
 # --------------------
@@ -121,7 +121,7 @@ suporte_familiar["family_support"] =  suporte_familiar["family_support"].astype(
 suporte_familiar
 # %%
 # Salvando tabela grau de dependencia
-suporte_familiar.to_csv("../../../../data/SMSAp/lake/SuporteFamiliar.csv")
+suporte_familiar.to_csv("../../../../data/SMSAp/lake/SuporteFamiliar.csv", index=False)
 print("✅Tabela Grau de dependência foi salva no lake!")
 # %%
 # --------------------
@@ -140,7 +140,7 @@ ILPI = ILPI.drop_duplicates(subset=["id_institution"]).sort_values(by="id_instit
 ILPI
 # %%
 # Salvando tabela grau de dependencia
-ILPI.to_csv("../../../../data/SMSAp/lake/ILPI.csv")
+ILPI.to_csv("../../../../data/SMSAp/lake/ILPI.csv", index=False)
 print("✅Tabela ILPI foi salva no lake!")
 # %%
 # --------------------
@@ -159,7 +159,7 @@ qtde_medic_vaz = qtde_medic_vaz.groupby(["id_institution", "uuidv5"]).size().res
 qtde_medic_vaz
 # %%
 # Salvando tabela Qtde Medicamento por Residente
-qtde_medic_vaz.to_csv('../../../../data/SMSAp/lake/QtdeMedicTot.csv')
+qtde_medic_vaz.to_csv('../../../../data/SMSAp/lake/QtdeMedicTot.csv', index=False)
 print("✅Tabela Qtde Medicamento foi salva no lake!")
 # %%
 
@@ -197,7 +197,7 @@ morb = morb[["id_institution", "uuidv5", "soma_morbidities"]]
 morb
 # %%
 # Salvando tabela Numero de Morbidades por Residente
-morb.to_csv('../../../../data/SMSAp/lake/NumMorbidades.csv')
+morb.to_csv('../../../../data/SMSAp/lake/NumMorbidades.csv', index=False)
 print("✅Tabela Numero de Morbidades foi salva no lake!")
 # %%
 
@@ -219,7 +219,7 @@ mobility = limpar_e_converter_colunas(mobility, colunas_para_converter)
 mobility
 # %%
 # Salvando tabela mobilidade
-mobility.to_csv("../../../../data/SMSAp/lake/Mobility.csv")
+mobility.to_csv("../../../../data/SMSAp/lake/Mobilidade.csv", index=False)
 print("✅Tabela ILPI foi salva no lake!")
 
 # %%
@@ -232,7 +232,7 @@ hospitalization = hospitalization[hospitalization["elder_hospitalized"].notna()]
 hospitalization
 # %%
 # Salvando tabela Estado Nutricional
-hospitalization.to_csv("../../../../data/SMSAp/lake/Hospitalizacao.csv")
+hospitalization.to_csv("../../../../data/SMSAp/lake/Hospitalizacao.csv", index=False)
 print("✅Tabela Estado Nutricional foi salva no lake!")
 # %%
 # --------------------
@@ -244,7 +244,7 @@ falls = falls.dropna()
 falls
 # %%
 # Salvando tabela Quedas 
-falls.to_csv("../../../../data/SMSAp/lake/Quedas.csv")
+falls.to_csv("../../../../data/SMSAp/lake/Quedas.csv", index=False)
 print("✅Tabela Quedas foi salva no lake!")
 # %%
 # -------------------
@@ -271,7 +271,7 @@ nutritional = limpar_e_converter_colunas(nutritional, colunas_para_converter)
 nutritional
 # %%
 # Salvando tabela Estado Nutricional
-nutritional.to_csv("../../../../data/SMSAp/lake/EstadoNutricional.csv")
+nutritional.to_csv("../../../../data/SMSAp/lake/EstadoNutricional.csv", index=False)
 print("✅Tabela Estado Nutricional foi salva no lake!")
 # %%
 # --------------------
@@ -283,7 +283,7 @@ abvd = abvd[abvd["basic_activities_diffic"].notna()].astype({"basic_activities_d
 abvd
 # %%
 # Salvando tabela ABVD
-abvd.to_csv("../../../../data/SMSAp/lake/ABVD.csv")
+abvd.to_csv("../../../../data/SMSAp/lake/ABVD.csv", index=False)
 # %%
 
 # %%
@@ -310,8 +310,6 @@ colunms_to_drop = ["id_institution_right", "id_institution_left", "id_institutio
 mpi_table.drop(columns=colunms_to_drop, axis=1, inplace=True)
 
 mpi_table.columns
-
-# %%
 
 # %%
 

@@ -784,10 +784,545 @@ def aplicar_brief_mpi(df: pd.DataFrame) -> pd.DataFrame:
 
     return df_final
 
+# # %%
+# df_out = aplicar_brief_mpi(df)
+# print(df_out.head()[["id_institution", "uuidv5", "full_name", "total_score", "MPI", "risk"]])
+
+# # %%
+# df_out
+# # %%
+
+# import pandas as pd
+# import numpy as np
+
+# def calcular_scores(df):
+#     df_scores = pd.DataFrame()
+    
+#     # manter a ordem das duas primeiras colunas
+#     df_scores["id_institution"] = df["id_institution"]
+#     df_scores["uuidv5"] = df["uuidv5"]
+    
+#     # =========================
+#     # 1. Pontuação bruta
+#     # =========================
+#     df_scores["sex_score"] = df["sex"].map({1: 0, 2: 1})
+#     df_scores["race_score"] = df["race"].apply(lambda x: 0 if x in [1, 4] else 1)
+#     df_scores["education_score"] = df["education"].apply(lambda x: 1 if x in [1, 2] else 0)
+
+#     df_scores["basic_activities_score"] = df["basic_activities_diffic"].map({1: 0, 2: 1})
+
+#     df_scores["physical_score"] = (
+#         df[["physical_desabilities___1", "physical_desabilities___2"]].notna().any(axis=1).astype(int)
+#     )
+#     df_scores["physical_score"] = df_scores["physical_score"] - df["physical_desabilities___3"].fillna(0).astype(int)
+
+#     df_scores["mobility_score"] = df["elder_mobility"].map({1: 1, 2: 0})
+#     df_scores["difficulties_score"] = df["elder_difficulties"].map({1: 0, 2: 1})
+
+#     df_scores["falls_score"] = df["falls_number"].apply(lambda x: 0 if x == 1 else (1 if x in [2, 3] else np.nan))
+
+#     df_scores["inpatient_score"] = df["elder_hospitalized"].apply(lambda x: 0 if x == 1 else 1)
+
+#     df_scores["strength_score"] = df["elder_strenght"].map({1: 1, 2: 0})
+#     df_scores["weight_loss_score"] = df["weight_loss"].map({1: 1, 2: 0})
+#     df_scores["amount_weight_loss_score"] = df["amount_weigth_loss"].map({1: 1, 2: 2})
+
+#     # =========================
+#     # 2. Normalização por domínio
+#     # =========================
+#     df_scores["score_social"] = (df_scores["sex_score"] + df_scores["race_score"] + df_scores["education_score"]).apply(
+#         lambda x: 1 if x == 3 else (0.5 if x in [1, 2] else 0)
+#     )
+
+#     df_scores["score_abvd"] = df_scores["basic_activities_score"].apply(
+#         lambda x: 0 if x == 0 else (0.5 if x == 1 else 1)
+#     )
+
+#     df_scores["score_mobility"] = df_scores["mobility_score"].apply(
+#         lambda x: 0 if x == 0 else (0.5 if x == 1 else 1)
+#     )
+
+#     df_scores["score_falls"] = df_scores["falls_score"].apply(
+#         lambda x: 0 if x == 0 else (0.5 if x == 1 else 1)
+#     )
+
+#     df_scores["score_inpatient"] = df_scores["inpatient_score"].apply(
+#         lambda x: 0 if x in [1, 2] else (0.5 if 2 < x < 4 else 1 if x >= 4 else 0)
+#     )
+
+#     df_scores["score_nutrition"] = (df_scores["weight_loss_score"] + df_scores["amount_weight_loss_score"]).apply(
+#         lambda x: 0 if x == 0 else (0.5 if x == 1 else 1)
+#     )
+
+#     df_scores["score_comorb"] = df["comorbidities"].apply(
+#         lambda x: 0 if x == 0 else (0.5 if x in [1, 2] else 1)
+#     )
+
+#     df_scores["score_drugs"] = df["medications"].apply(
+#         lambda x: 0 if x <= 3 else (0.5 if 4 <= x <= 6 else 1)
+#     )
+
+#     df_scores["score_nursing_home"] = df["nursing_home"].apply(
+#         lambda x: 0 if 0 <= x <= 2 else (0.5 if 3 <= x <= 4 else 1)
+#     )
+
+#     return df_scores
+
+# # %%
+
+# teste = calcular_scores(df)
+# # %%
+# def calcular_scores(df):
+#     df_scores = pd.DataFrame()
+    
+#     # manter a ordem das duas primeiras colunas
+#     df_scores["id_institution"] = df["institution_name"]
+#     df_scores["uuidv5"] = df["uuidv5"]
+    
+#     # =========================
+#     # 1. Pontuação bruta
+#     # =========================
+#     df_scores["sex_score"] = df["sex"].map({1: 0, 2: 1})
+#     df_scores["race_score"] = df["race"].apply(lambda x: 0 if x in [1, 4] else 1)
+#     df_scores["education_score"] = df["education"].apply(lambda x: 1 if x in [1, 2] else 0)
+
+#     df_scores["basic_activities_score"] = df["basic_activities_diffic"].map({1: 0, 2: 1})
+
+#     df_scores["physical_score"] = (
+#         df[["physical_desabilities___1", "physical_desabilities___2"]].notna().any(axis=1).astype(int)
+#     )
+#     df_scores["physical_score"] = df_scores["physical_score"] - df["physical_desabilities___3"].fillna(0).astype(int)
+
+#     df_scores["mobility_score"] = df["elder_mobility"].map({1: 1, 2: 0})
+#     df_scores["difficulties_score"] = df["elder_difficulties"].map({1: 0, 2: 1})
+
+#     df_scores["falls_score"] = df["falls_number"].apply(lambda x: 0 if x == 1 else (1 if x in [2, 3] else None))
+
+#     df_scores["inpatient_score"] = df["elder_hospitalized"].apply(lambda x: 0 if x == 1 else 1)
+
+#     df_scores["strength_score"] = df["elder_strenght"].map({1: 1, 2: 0})
+#     df_scores["weight_loss_score"] = df["weight_loss"].map({1: 1, 2: 0})
+#     df_scores["amount_weight_loss_score"] = df["amount_weigth_loss"].map({1: 1, 2: 2})
+
+#     # =========================
+#     # 2. Normalização por domínio
+#     # =========================
+#     df_scores["score_social"] = (df_scores["sex_score"] + df_scores["race_score"] + df_scores["education_score"]).apply(
+#         lambda x: 1 if x == 3 else (0.5 if x in [1, 2] else 0)
+#     )
+
+#     df_scores["score_abvd"] = df_scores["basic_activities_score"].apply(
+#         lambda x: 0 if x == 0 else (0.5 if x == 1 else 1)
+#     )
+
+#     df_scores["score_mobility"] = df_scores["mobility_score"].apply(
+#         lambda x: 0 if x == 0 else (0.5 if x == 1 else 1)
+#     )
+
+#     df_scores["score_falls"] = df_scores["falls_score"].apply(
+#         lambda x: 0 if x == 0 else (0.5 if x == 1 else 1)
+#     )
+
+#     df_scores["score_inpatient"] = df["elder_hospitalized"].apply(
+#         lambda x: 0 if x in [1, 2] else (0.5 if 3 <= x <= 4 else 1)
+#     )
+
+#     df_scores["score_nutrition"] = (df_scores["weight_loss_score"] + df_scores["amount_weight_loss_score"]).apply(
+#         lambda x: 0 if x == 0 else (0.5 if x == 1 else 1)
+#     )
+
+#     df_scores["score_comorb"] = df["comorbidities"].apply(
+#         lambda x: 0 if x == 0 else (0.5 if x in [1, 2] else 1)
+#     )
+
+#     df_scores["score_drugs"] = df["medications"].apply(
+#         lambda x: 0 if x <= 3 else (0.5 if 4 <= x <= 6 else 1)
+#     )
+
+#     df_scores["score_nursing_home"] = df["nursing_home"].apply(
+#         lambda x: 0 if 0 <= x <= 2 else (0.5 if 3 <= x <= 4 else 1)
+#     )
+
+#     # =========================
+#     # 3. Score total (normalizado)
+#     # =========================
+#     score_cols = [
+#         "score_social", "score_abvd", "score_mobility", "score_falls",
+#         "score_inpatient", "score_nutrition", "score_comorb", "score_drugs", "score_nursing_home"
+#     ]
+#     df_scores["score_total"] = df_scores[score_cols].mean(axis=1)
+
+#     return df_scores
+
+# # Aplicar função
+# df_scores = calcular_scores(df)
+# # %%
+# def calcular_scores(df):
+#     df_scores = pd.DataFrame()
+    
+#     # IDs principais
+#     df_scores["id_institution"] = df["id_institution"]
+#     df_scores["uuidv5"] = df["uuidv5"]
+
+#     # ---- SOCIAL ----
+#     df_scores["sex_score"] = df["sex"].map({1: 0, 2: 1})
+#     df_scores["race_score"] = df["race"].apply(lambda x: 0 if x in [1, 4] else 1)
+#     df_scores["education_score"] = df["education"].apply(lambda x: 1 if x in [1, 2] else 0)
+
+#     df_scores["score_social_raw"] = (
+#         df_scores["sex_score"] +
+#         df_scores["race_score"] +
+#         df_scores["education_score"]
+#     )
+#     df_scores["score_social"] = df_scores["score_social_raw"].map(
+#         {3: 1, 1: 0.5, 2: 0.5, 0: 0}
+#     )
+
+#     # ---- ABVD ----
+#     df_scores["abvd_score"] = df["basic_activities_diffic"].map({1: 0, 2: 1})
+#     df_scores["score_abvd"] = df_scores["abvd_score"].map({0: 0, 1: 0.5, 2: 1})
+
+#     # ---- MOBILIDADE ----
+#     df_scores["mobility_score"] = df["elder_mobility"].map({1: 1, 2: 0})
+#     df_scores["difficulties_score"] = df["elder_difficulties"].map({1: 0, 2: 1})
+
+#     df_scores["score_mobility_raw"] = (
+#         df_scores["mobility_score"] + df_scores["difficulties_score"]
+#     )
+#     df_scores["score_mobility"] = df_scores["score_mobility_raw"].map(
+#         {0: 0, 1: 0.5, 2: 1}
+#     )
+
+#     # ---- INTERNAÇÃO ----
+#     df_scores["inpatient_score"] = df["elder_hospitalized"].apply(lambda x: 0 if x == 1 else 1)
+#     df_scores["score_inpatient"] = df_scores["inpatient_score"].apply(
+#         lambda x: 0 if x == 0 else (0.5 if x == 1 else 1)
+#     )
+
+#     # ---- QUEDAS ----
+#     df_scores["falls_score"] = df["falls_number"].apply(lambda x: 0 if x == 1 else 1)
+#     df_scores["score_falls"] = df_scores["falls_score"].map({0: 0, 1: 0.5, 2: 1})
+
+#     # ---- NUTRIÇÃO ----
+#     df_scores["strenght_score"] = df["elder_strenght"].map({1: 1, 2: 0})
+#     df_scores["weight_loss_score"] = df["weight_loss"].map({1: 1, 2: 0})
+#     df_scores["amount_weight_score"] = df["amount_weight_loss"].map({1: 1, 2: 2})
+
+#     df_scores["score_nutrition_raw"] = (
+#         df_scores["strenght_score"] +
+#         df_scores["weight_loss_score"] +
+#         df_scores["amount_weight_score"]
+#     )
+#     df_scores["score_nutrition"] = df_scores["score_nutrition_raw"].map(
+#         {0: 0, 1: 0.5, 2: 1}
+#     )
+
+#     return df_scores
+
+# # %%
+# df_scores = calcular_scores(df)
+# # %%
+# df_scores
+# # %%
+# import pandas as pd
+
+# def calcular_scores(df):
+#     df_scores = pd.DataFrame()
+
+#     # IDs principais
+#     df_scores["id_institution"] = df["id_institution"]
+#     df_scores["uuidv5"] = df["uuidv5"]
+
+#     # ---- SOCIAL ----
+#     df_scores["sex_score"] = df["sex"].map({1: 0, 2: 1})
+#     df_scores["race_score"] = df["race"].apply(lambda x: 0 if x in [1, 4] else 1)
+#     df_scores["education_score"] = df["education"].apply(lambda x: 1 if x in [1, 2] else 0)
+
+#     df_scores["score_social_raw"] = (
+#         df_scores["sex_score"] +
+#         df_scores["race_score"] +
+#         df_scores["education_score"]
+#     )
+#     df_scores["score_social"] = df_scores["score_social_raw"].map(
+#         {3: 1, 2: 0.5, 1: 0.5, 0: 0}
+#     )
+
+#     # ---- ABVD ----
+#     df_scores["abvd_score"] = df["basic_activities_diffic"].map({1: 0, 2: 1})
+#     df_scores["score_abvd"] = df_scores["abvd_score"].map({0: 0, 1: 0.5})
+
+#     # ---- MOBILIDADE ----
+#     df_scores["mobility_score"] = df["elder_mobility"].map({1: 1, 2: 0})
+#     df_scores["difficulties_score"] = df["elder_difficulties"].map({1: 0, 2: 1})
+
+#     df_scores["score_mobility_raw"] = (
+#         df_scores["mobility_score"] + df_scores["difficulties_score"]
+#     )
+#     df_scores["score_mobility"] = df_scores["score_mobility_raw"].map(
+#         {0: 0, 1: 0.5, 2: 1}
+#     )
+
+#     # ---- INTERNAÇÃO ----
+#     df_scores["inpatient_score"] = df["elder_hospitalized"].apply(lambda x: 0 if x == 1 else 1)
+#     df_scores["score_inpatient"] = df_scores["inpatient_score"].map({0: 0, 1: 0.5})
+
+#     # ---- QUEDAS ----
+#     df_scores["falls_score"] = df["falls_number"].apply(lambda x: 0 if x == 1 else 1)
+#     df_scores["score_falls"] = df_scores["falls_score"].map({0: 0, 1: 0.5})
+
+#     # ---- NUTRIÇÃO ----
+#     df_scores["strength_score"] = df["elder_strenght"].map({1: 1, 2: 0})
+#     df_scores["weight_loss_score"] = df["weight_loss"].map({1: 1, 2: 0})
+#     df_scores["amount_weight_loss_score"] = df["amount_weight_loss"].map({1: 1, 2: 2})
+
+#     df_scores["score_nutrition_raw"] = (
+#         df_scores["strength_score"] +
+#         df_scores["weight_loss_score"] +
+#         df_scores["amount_weight_loss_score"]
+#     )
+#     df_scores["score_nutrition"] = df_scores["score_nutrition_raw"].map(
+#         {0: 0, 1: 0.5, 2: 1, 3: 1}
+#     )
+
+#     # ---- COMORBIDADES ----
+#     df_scores["comorbidity_score"] = df["soma_morbidities"].apply(
+#         lambda x: 0 if x == 0 else (0.5 if x in [1, 2] else 1)
+#     )
+#     df_scores["score_comorbidity"] = df_scores["comorbidity_score"]
+
+#     # ---- POLIFARMÁCIA ----
+#     df_scores["drugs_score"] = df["qtd_medic_vaz"].apply(
+#         lambda x: 0 if x <= 3 else (0.5 if 4 <= x <= 6 else 1)
+#     )
+#     df_scores["score_drugs"] = df_scores["drugs_score"]
+
+#     # ---- TEMPO DE INSTITUIÇÃO ----
+#     df_scores["nursing_score"] = df["institut_time_years"].apply(
+#         lambda x: 0 if x < 12 else (0.5 if 12 <= x < 24 else 1)
+#     )
+#     df_scores["score_nursing_home"] = df_scores["nursing_score"]
+
+#     return df_scores
+
+
+# def aplicar_brief_mpi(df):
+#     df_scores = calcular_scores(df)
+
+#     # estrutura organizada por domínios
+#     dominios = [
+#         "score_social",
+#         "score_abvd",
+#         "score_mobility",
+#         "score_inpatient",
+#         "score_falls",
+#         "score_nutrition",
+#         "score_comorbidity",
+#         "score_drugs",
+#         "score_nursing_home",
+#     ]
+
+#     df_scores["brief_mpi_total"] = df_scores[dominios].sum(axis=1)
+
+#     # retornar só colunas finais (mas mantemos ids)
+#     cols_saida = ["id_institution", "uuidv5"] + dominios + ["brief_mpi_total"]
+#     return df_scores[cols_saida]
+
+# teste = aplicar_brief_mpi(df)
+# # %%
+
+# teste["score_nursing_home"].max()
 # %%
-df_out = aplicar_brief_mpi(df)
-print(df_out.head()[["id_institution", "uuidv5", "full_name", "total_score", "MPI", "risk"]])
+
+
+
+
+
+import numpy as np
+
+def _safe_col(df, name):
+    """Retorna coluna se existir, senão série de NaN com mesmo index."""
+    return df[name] if name in df.columns else pd.Series([np.nan]*len(df), index=df.index)
+
+def calcular_scores(df, keep_raw=False):
+    """
+    Retorna DataFrame com colunas por domínio normalizadas (0, 0.5, 1),
+    MPI normalizado (0..1) e classificação de risco.
+    keep_raw=True inclui colunas intermediárias (brutas).
+    """
+    # preparar saída
+    out = pd.DataFrame(index=df.index)
+
+    # ids
+    out["id_institution"] = _safe_col(df, "id_institution")
+    out["uuidv5"] = _safe_col(df, "uuidv5")
+    if "full_name" in df.columns:
+        out["full_name"] = _safe_col(df, "full_name")
+
+    # --- valores de entrada (com fallback) ---
+    sex = _safe_col(df, "sex").fillna(0).astype(int)
+    race = _safe_col(df, "race").fillna(0).astype(int)
+    education = _safe_col(df, "education").fillna(0).astype(int)
+
+    basic_act = _safe_col(df, "basic_activities_diffic").fillna(0).astype(int)
+    phys1 = _safe_col(df, "physical_desabilities___1").fillna(0).astype(int)
+    phys2 = _safe_col(df, "physical_desabilities___2").fillna(0).astype(int)
+    phys3 = _safe_col(df, "physical_desabilities___3").fillna(0).astype(int)
+
+    elder_mobility = _safe_col(df, "elder_mobility").fillna(0).astype(int)
+    elder_difficulties = _safe_col(df, "elder_difficulties").fillna(0).astype(int)
+
+    falls_number = _safe_col(df, "falls_number").fillna(1).astype(int)  # assume code 1 = no
+    elder_hospitalized = _safe_col(df, "elder_hospitalized").fillna(0).astype(int)
+
+    elder_strenght = _safe_col(df, "elder_strenght").fillna(0).astype(int)
+    weight_loss = _safe_col(df, "weight_loss").fillna(0).astype(int)
+    amount_weight_loss = _safe_col(df, "amount_weight_loss").fillna(0).astype(int)
+
+    comorbidities = _safe_col(df, "soma_morbidities").fillna(0).astype(int)
+    drugs = _safe_col(df, "qtd_medic_vaz").fillna(0).astype(int)
+    nursing_time = _safe_col(df, "institut_time_years").fillna(0).astype(float)
+
+    # -----------------------
+    # 1) Scores brutos (0/1 ou pequeno inteiro)
+    # -----------------------
+    # Social: sex, race, education
+    sex_score = sex.map({1: 0, 2: 1}).fillna(0).astype(int)
+    race_score = race.apply(lambda x: 0 if x in [1, 4] else 1).astype(int)
+    education_score = education.apply(lambda x: 1 if x in [1, 2] else 0).astype(int)
+    social_raw = sex_score + race_score + education_score   # 0..3
+
+    # ABVD: basic + physical (physical = 1 if phys1 or phys2 present; phys3 ignored)
+    basic_score = basic_act.map({1: 0, 2: 1}).fillna(0).astype(int)
+    physical_score = ((phys1 == 1) | (phys2 == 1)).astype(int)   # 0/1
+    abvd_raw = basic_score + physical_score   # 0..2
+
+    # Mobility: elder_mobility (1->1, 2->0) + elder_difficulties (1->0, 2->1)
+    mobility_comp = elder_mobility.map({1: 1, 2: 0}).fillna(0).astype(int)
+    difficulties_comp = elder_difficulties.map({1: 0, 2: 1}).fillna(0).astype(int)
+    mobility_raw = mobility_comp + difficulties_comp   # 0..2
+
+    # Falls: interpretacao comum: code 1=no, 2=one, >=3=multiple
+    falls_raw = np.where(falls_number == 1, 0,
+                         np.where(falls_number == 2, 1,
+                                  np.where(falls_number >= 3, 2, 0))).astype(int)
+
+    # Inpatient: usar número/flag de internações (se 0->0, 1->0.5, >=2->1 depois)
+    inpatient_raw = elder_hospitalized.astype(int)  # 0,1,2,...
+
+    # Nutrition: combine strength, weight_loss, amount_weight_loss
+    strength_score = elder_strenght.map({1: 1, 2: 0}).fillna(0).astype(int)
+    weightloss_score = weight_loss.map({1: 1, 2: 0}).fillna(0).astype(int)
+    # amount_weight_loss: code 1 -> 1, 2 -> 2
+    amount_score = amount_weight_loss.apply(lambda x: 1 if x == 1 else (2 if x == 2 else 0)).astype(int)
+    # raw nutrition => cap at 2 (we map 0->0, 1->0.5, >=2->1)
+    nutrition_raw = (strength_score + weightloss_score + amount_score)
+    nutrition_raw = np.minimum(nutrition_raw, 2).astype(int)
+
+    # Comorbidity and drugs and nursing time (we will map to 0/0.5/1 using your rules)
+    comorb_raw = comorbidities.astype(int)   # 0,1,2,3...
+    drugs_raw = drugs.astype(int)            # number of active principles
+    nursing_raw = nursing_time.astype(float) # years (or numeric) as you provided
+
+    # keep raw columns if user wants them later
+    if keep_raw:
+        out["social_raw"] = social_raw
+        out["abvd_raw"] = abvd_raw
+        out["mobility_raw"] = mobility_raw
+        out["falls_raw"] = falls_raw
+        out["inpatient_raw"] = inpatient_raw
+        out["nutrition_raw"] = nutrition_raw
+        out["comorb_raw"] = comorb_raw
+        out["drugs_raw"] = drugs_raw
+        out["nursing_raw"] = nursing_raw
+
+    # -----------------------
+    # 2) Normalizar cada domínio para {0, 0.5, 1}
+    # -----------------------
+    # social: 3->1, 1/2->0.5, 0->0
+    score_social = np.where(social_raw == 3, 1.0,
+                            np.where(social_raw >= 1, 0.5, 0.0))
+
+    # ABVD: raw 0->0, 1->0.5, 2->1
+    score_abvd = np.where(abvd_raw == 2, 1.0, np.where(abvd_raw == 1, 0.5, 0.0))
+
+    # mobility: raw 0->0,1->0.5,2->1
+    score_mobility = np.where(mobility_raw == 2, 1.0, np.where(mobility_raw == 1, 0.5, 0.0))
+
+    # falls: raw 0->0,1->0.5,2->1
+    score_falls = np.where(falls_raw == 2, 1.0, np.where(falls_raw == 1, 0.5, 0.0))
+
+    # inpatient: 0->0, 1->0.5, >=2->1
+    score_inpatient = np.where(inpatient_raw >= 2, 1.0,
+                               np.where(inpatient_raw == 1, 0.5, 0.0))
+
+    # nutrition: 0->0, 1->0.5, >=2->1 (we capped nutritional_raw at 2)
+    score_nutrition = np.where(nutrition_raw >= 2, 1.0, np.where(nutrition_raw == 1, 0.5, 0.0))
+
+    # comorbidity: 0->0, 1-2->0.5, >=3->1
+    score_comorb = np.where(comorb_raw >= 3, 1.0, np.where(comorb_raw >= 1, 0.5, 0.0))
+
+    # drugs: 0-3->0, 4-6->0.5, >=7->1
+    score_drugs = np.where(drugs_raw >= 7, 1.0, np.where(drugs_raw >= 4, 0.5, 0.0))
+
+    # nursing_time (institut_time_years): 0-2 -> 0, 3-4 -> 0.5, >=5 -> 1
+    score_nursing = np.where(nursing_raw >= 5, 1.0,
+                             np.where((nursing_raw >= 3) & (nursing_raw <= 4), 0.5, 0.0))
+
+    # -----------------------
+    # 3) Construir saída (cada domínio e MPI normalizado)
+    # -----------------------
+    out["score_social"] = score_social
+    out["score_abvd"] = score_abvd
+    out["score_mobility"] = score_mobility
+    out["score_falls"] = score_falls
+    out["score_inpatient"] = score_inpatient
+    out["score_nutrition"] = score_nutrition
+    out["score_comorb"] = score_comorb
+    out["score_drugs"] = score_drugs
+    out["score_nursing"] = score_nursing
+
+    # MPI normalizado: média dos 9 domínios (0..1)
+    domain_cols = [
+        "score_social", "score_abvd", "score_mobility", "score_falls",
+        "score_inpatient", "score_nutrition", "score_comorb", "score_drugs", "score_nursing"
+    ]
+    out["MPI"] = round(out[domain_cols].mean(axis=1), 2)
+ 
+
+    # classificação conforme suas faixas
+
+    out["risk"] = np.where(out["MPI"] <= 0.33, "Leve (MPI 1)",
+                           np.where(out["MPI"] <= 0.66, "Moderado (MPI 2)", "Alto (MPI 3)"))
+   
+    
+
+    # reordenar colunas: id_institution, uuidv5, full_name (se presente), depois domínios, MPI, risk
+    cols_after_id = []
+    if "full_name" in out.columns:
+        cols_after_id.append("full_name")
+    cols_after_id += domain_cols + ["MPI", "risk"]
+
+    final_cols = ["id_institution", "uuidv5"] + cols_after_id
+    return out[final_cols]
+
+def aplicar_brief_mpi(df, keep_raw=False):
+    """Wrapper — retorna o DataFrame final com domínios normalizados e MPI."""
+    return calcular_scores(df, keep_raw=keep_raw)
+
+
+df_score = aplicar_brief_mpi(df)
+# %%
+df_score
+# %%
+
+####### PAREI AQUI
+df_score.head(10)[["id_institution", "uuidv5", "full_name", "MPI", "risk"]]
+df_score.sort_values(by="MPI", ascending=False)
 
 # %%
-df_out
+
+# Salvando a tabela Score para o lake
+
+df_score.to_csv("../../../../data/SMSAp/lake/mpiScore.csv", index=False)
+print("✅Tabela MPI Score foi salva no lake!")
 # %%
