@@ -126,7 +126,7 @@
 # %%
 import sqlite3
 import pandas as pd
-from ingestion import importar_todos_csvs
+from surveys.SMSAp.ILPI.src.ingestion import importar_todos_csvs
 # Criação do banco de dados SQLite
 conn = sqlite3.connect('ilpi.db')
 cursor = conn.cursor()
@@ -144,16 +144,17 @@ CREATE TABLE IF NOT EXISTS ILPI (
 )
 ''')
 
+
 # Tabela Residente
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS Residente (
-    id_UUID VARCHAR PRIMARY KEY,                      -- UUID gerado a partir do CPF
-    id_instituicao INTEGER,                           -- Código da instituição
+    uuidv5  VARCHAR PRIMARY KEY,                      -- UUID gerado a partir do CPF
+    id_instituicao INTEGER FOREIGN KEY,               -- Código da instituição
     full_name TEXT,                                   -- Nome completo do paciente
-    cpf INTEGER UNIQUE,                               -- CPF (deve ser único)
     date_of_birth DATE,                               -- Data de nascimento 
     elder_age INTEGER,                                -- Idade do residente
     sex TEXT,                                         -- Gênero do paciente
+    education integer                                 -- Grau de escolaridade          
     FOREIGN KEY (id_instituicao) REFERENCES ILPI(id_instituicao)
 )
 ''')
@@ -161,23 +162,20 @@ CREATE TABLE IF NOT EXISTS Residente (
 # Tabela TempoInstituicao
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS TempoInstituicao (
-    id_residente VARCHAR,                             -- UUID do residente
-    id_instituicao INTEGER,                           -- Código da instituição
-    institut_time_years FLOAT,                        -- Tempo na instituição (anos)
-    PRIMARY KEY (id_residente, id_instituicao),
-    FOREIGN KEY (id_residente) REFERENCES Residente(id_UUID),
+    uuidv5  VARCHAR PRIMARY KEY,                      -- UUID do residente
+    id_instituicao INTEGER FOREIGN KEY,               -- Código da instituição
+    intitution_time_year  INTEGER,                    -- Tempo na instituição (anos)
     FOREIGN KEY (id_instituicao) REFERENCES ILPI(id_instituicao)
 )
 ''')
 
+
 # Tabela SuporteFamiliar
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS SuporteFamiliar (
-    id_residente VARCHAR,                             -- UUID do residente
-    id_instituicao INTEGER,                           -- Código da instituição
-    family_support TEXT,                              -- Suporte da família
-    PRIMARY KEY (id_residente, id_instituicao),
-    FOREIGN KEY (id_residente) REFERENCES Residente(id_UUID),
+    uuidv5  VARCHAR PRIMARY KEY,                      -- UUID do residente
+    id_instituicao INTEGER FOREIGN KEY,               -- Código da instituição
+    family_support INTEGER,                           -- Suporte da família
     FOREIGN KEY (id_instituicao) REFERENCES ILPI(id_instituicao)
 )
 ''')
@@ -185,11 +183,9 @@ CREATE TABLE IF NOT EXISTS SuporteFamiliar (
 # Tabela GrauDependencia
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS GrauDependencia (
-    id_residente VARCHAR,
-    id_instituicao INTEGER,
+    uuidv5  VARCHAR PRIMARY KEY,                      -- UUID do residente
+    id_instituicao INTEGER FOREIGN KEY,               -- Código da instituição
     dependence_degree INTEGER,
-    PRIMARY KEY (id_residente, id_instituicao),
-    FOREIGN KEY(id_residente) REFERENCES Residente(id_UUID),
     FOREIGN KEY(id_instituicao) REFERENCES ILPI(id_instituicao)
 )
 ''')
@@ -197,11 +193,9 @@ CREATE TABLE IF NOT EXISTS GrauDependencia (
 # Tabela QtdeMedicTot
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS QtdeMedicTot (
-    id_residente VARCHAR,
-    id_instituicao INTEGER,
+    uuidv5  VARCHAR PRIMARY KEY,                      -- UUID do residente
+    id_instituicao INTEGER FOREIGN KEY,               -- Código da instituição
     tot_medicin INTEGER,
-    PRIMARY KEY (id_residente, id_instituicao),
-    FOREIGN KEY(id_residente) REFERENCES Residente(id_UUID),
     FOREIGN KEY(id_instituicao) REFERENCES ILPI(id_instituicao)
 )
 ''')
@@ -209,13 +203,9 @@ CREATE TABLE IF NOT EXISTS QtdeMedicTot (
 # Tabela Morbidades
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS Morbidades (
-    id_residente VARCHAR,
-    id_instituicao INTEGER,
-    morbidades TEXT,
-    other_morbidities TEXT,
+    uuidv5  VARCHAR PRIMARY KEY,                      -- UUID do residente
+    id_instituicao INTEGER FOREIGN KEY,               -- Código da instituição
     soma_morbidities INTEGER,
-    PRIMARY KEY (id_residente, id_instituicao),
-    FOREIGN KEY(id_residente) REFERENCES Residente(id_UUID),
     FOREIGN KEY(id_instituicao) REFERENCES ILPI(id_instituicao)
 )
 ''')
@@ -223,33 +213,30 @@ CREATE TABLE IF NOT EXISTS Morbidades (
 # Tabela EstadoSaude
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS EstadoSaude (
-    id_residente VARCHAR,
-    id_instituicao INTEGER,
-    health_condition TEXT,
-    PRIMARY KEY (id_residente, id_instituicao),
-    FOREIGN KEY(id_residente) REFERENCES Residente(id_UUID),
+    uuidv5  VARCHAR PRIMARY KEY,                      -- UUID do residente
+    id_instituicao INTEGER FOREIGN KEY,               -- Código da instituição
+    health_condition INTEGER,
     FOREIGN KEY(id_instituicao) REFERENCES ILPI(id_instituicao)
 )
 ''')
 
-# Tabela Emergencia
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS Emergencia (
-    id_residente VARCHAR,
-    id_instituicao INTEGER,
-    PRIMARY KEY (id_residente, id_instituicao),
-    FOREIGN KEY(id_residente) REFERENCES Residente(id_UUID),
-    FOREIGN KEY(id_instituicao) REFERENCES ILPI(id_instituicao)
-)
-''')
+# # Tabela Emergencia
+# cursor.execute('''
+# CREATE TABLE IF NOT EXISTS Emergencia (
+#     id_residente VARCHAR FOREIGN KEY,
+#     id_instituicao INTEGER FOREIGN KEY,
+#     PRIMARY KEY (id_residente, id_instituicao),
+#     FOREIGN KEY(id_residente) REFERENCES Residente(id_UUID),
+#     FOREIGN KEY(id_instituicao) REFERENCES ILPI(id_instituicao)
+# )
+# ''')
 
 # Tabela Hospitalizacao
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS Hospitalizacao (
-    id_residente VARCHAR,
-    id_instituicao INTEGER,
-    PRIMARY KEY (id_residente, id_instituicao),
-    FOREIGN KEY(id_residente) REFERENCES Residente(id_UUID),
+    uuidv5  VARCHAR PRIMARY KEY,                      -- UUID do residente
+    id_instituicao INTEGER FOREIGN KEY,               -- Código da instituição
+    elder_hospitalization INTEGER,
     FOREIGN KEY(id_instituicao) REFERENCES ILPI(id_instituicao)
 )
 ''')
@@ -261,12 +248,11 @@ conn.close()
 print("Tabelas criadas com sucesso!!")
 
 
-
-
+##########PAREI AQUI 19/09
 
 # %%
 # Carregar os dados dos CSVs para DataFrames
-residentes_df = pd.read_csv('../Residente.csv').  #### parei aqui
+residentes_df = pd.read_csv('../Residente.csv')  #### parei aqui
 qtd_medic_total_df = pd.read_csv('QtdeMedicTot.csv')
 suporte_familiar_df = pd.read_csv('SuporteFamiliar.csv')
 estado_saude_df = pd.read_csv('estado_saude_residente.csv')
@@ -274,6 +260,22 @@ grau_dependencia_df = pd.read_csv('grau_dependencia_residente.csv')
 morbidades_df = pd.read_csv('Morbidades.csv')
 tempo_instit_residente_df = pd.read_csv('tempo_instit_residente.csv')
 
+
+"ILPI",
+        "Residente",
+        "TempoInstituicao",
+        "SuporteFamiliar",
+        "GrauDependencia",
+        "QtdeMedicTot",
+        "NumMorbidades",
+        "EstadoSaude",
+        "Quedas",
+        "ABVD",
+        "EstadoNutricional",
+        "Mobility",
+        "Hospitalizacao",
+        "mpiFinal",
+        "mpiScore",
 # %%
 
 
@@ -516,3 +518,70 @@ def importar_todos_csvs(pasta_csv):
 if __name__ == "__main__":
     importar_todos_csvs('../../../../data/SMSAp/lake/')
 # %%
+
+
+
+
+CREATE TABLE TempoInstituicao (
+  
+  intitution_time_year integer COMMENT 'tempo institucionalizado'
+);
+
+CREATE TABLE SuporteFamiliar (
+  uuidv5 integer PRIMARY KEY,
+  id_institution integer,
+  family_support integer COMMENT 'suporte da familia'
+);
+
+CREATE TABLE GrauDependencia (
+  uuidv5 integer PRIMARY KEY,
+  id_institution integer,
+  dependence_degree integer COMMENT 'grau dependência'
+);
+
+CREATE TABLE QtdeMedicTot (
+  uuidv5 integer PRIMARY KEY,
+  id_institution integer,
+  tot_medicin integer COMMENT 'numero de medicamentos'
+);
+
+CREATE TABLE Morbidades (
+  uuidv5 integer PRIMARY KEY,
+  id_institution integer,
+  soma_morbidities integer
+);
+
+CREATE TABLE EstadoSaude (
+  uuidv5 integer PRIMARY KEY,
+  id_institution integer,
+  health_condition integer COMMENT 'estado de saude'
+);
+
+-- CREATE TABLE emergencia (
+--   uuidv5 integer PRIMARY KEY,
+--   id_institution integer,
+--   family_support integer COMMENT 'atendimentos em UPA'
+-- );
+
+CREATE TABLE Hospitalizacao (
+  uuidv5 integer PRIMARY KEY,
+  id_institution integer,
+  elder_hospitalization integer COMMENT 'hospitalizacoes'
+);
+
+CREATE TABLE mpiScore (
+  uuidv5 integer PRIMARY KEY,
+  id_institution integer,
+  full_name varchar(255),
+  score_social float,
+  score_abvd float,
+  score_mobility float,
+  score_falls float,
+  score_inpatient float,
+  score_nutrition float,
+  score_comorb float,
+  score_drugs float,
+  score_nursing float,
+  MPI float,
+  risk varchar(25)
+);

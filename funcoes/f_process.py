@@ -755,7 +755,7 @@ def extrair_medicamentos_incluindo_vazios(df):
 
 # -----------------------------------------------
 
-def classificar_risco(df, condicoes_critico, condicoes_alerta, condicoes_atencao, incluir_sem_risco=True):
+def classificar_risco(df_score, condicao_critico, condicao_alerta, condicao_atencao ):
     """
     Aplica condições de risco e retorna:
     - DataFrame agrupado por 'cpf' com colunas: id_institution, cpf, full_name, risco (colorido em HTML)
@@ -763,21 +763,20 @@ def classificar_risco(df, condicoes_critico, condicoes_alerta, condicoes_atencao
    
      Parâmetros:
     - df: DataFrame original
-    - condicoes_critico, condicoes_alerta, condicoes_atencao: dicionários de condições
+    - condicao_critico, condicao_alerta, condicao_atencao: dicionários de condições
     
     - incluir_sem_risco: se True, classifica como 'Sem Risco' os registros que não se encaixam em nenhuma categoria
     OBS: Para visualizar cores no Jupyter, usar `display(HTML(resultado.to_html(escape=False)))`
     """
 
-    df_copia = df.copy()
+    df_score_copia = df_score.copy()
 
-    df_copia['risco'] = None
+    df_score_copia['risco'] = None
 
     cores_por_risco = {
-        'Crítico': 'red',
-        'Alerta': 'orange',
-        'Atenção': 'yellow',
-        'Sem Risco': 'green'
+        'Alto (MPI 3)': 'red',
+        'Moderado (MPI 2)': 'orange',
+        'Leve (MPI 1)': 'green'
     }
 
     def aplicar_classificacao(df_local, condicoes_dict, label):
@@ -787,27 +786,27 @@ def classificar_risco(df, condicoes_critico, condicoes_alerta, condicoes_atencao
         return cond.replace({True: label, False: None})
 
     for condicoes, label in [
-        (condicoes_critico, 'Crítico'),
-        (condicoes_alerta, 'Alerta'),
-        (condicoes_atencao, 'Atenção')
+        (condicao_critico, 'Alto (MPI 3'),
+        (condicao_alerta, 'Moderado (MPI 2)'),
+        (condicao_atencao, 'Leve (MPI 1)')
     ]:
-        mask = aplicar_classificacao(df_copia, condicoes, label)
-        condicao_vazia = df_copia['risco'].isna()
-        df_copia.loc[mask.notna() & condicao_vazia, 'risco'] = label
+        mask = aplicar_classificacao(df_score_copia, condicoes, label)
+        condicao_vazia = df_score_copia['risco'].isna()
+        df_score_copia.loc[mask.notna() & condicao_vazia, 'risco'] = label
 
-    # Preencher com "Sem Risco", se solicitado
-    if incluir_sem_risco:
-        df_copia.loc[df_copia['risco'].isna(), 'risco'] = 'Sem Risco'
+    # # Preencher com "Sem Risco", se solicitado
+    # if incluir_sem_risco:
+    #     df_copia.loc[df_copia['risco'].isna(), 'risco'] = 'Sem Risco'
 
     # Define a ordem de severidade
-    ordem_prioridade = {'Crítico': 0, 'Alerta': 1, 'Atenção': 2, 'Sem Risco': 3}
-    df_copia['prioridade'] = df_copia['risco'].map(ordem_prioridade)
+    ordem_prioridade = {'Alto (MPI 3)': 0, 'Moderado (MPI 2)': 1, 'Leve (MPI 1)': 2}
+    df_score_copia['prioridade'] = df_score_copia['risk'].map(ordem_prioridade)
 
     agrupado = (
-        df_copia
+        df_score_copia
         .sort_values('prioridade')
-        .groupby('cpf', as_index=False)
-        .first()[['id_institution', 'cpf', 'full_name', 'risco']]
+        .groupby('uuidv5', as_index=False)
+        .first()[['id_institution', 'uuidv5', 'full_name', 'risco']]
     )
 
     # Aplica cor HTML na coluna 'risco'
@@ -826,3 +825,5 @@ def classificar_risco(df, condicoes_critico, condicoes_alerta, condicoes_atencao
     )
 
     return agrupado.drop(columns=['risco']), resumo
+
+# %%

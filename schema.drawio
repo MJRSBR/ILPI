@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="XaFwVjKclIrAINl1U-Z8" name="Page-1">
-        <mxGraphModel dx="1139" dy="629" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" background="#FFFFFF" math="0" shadow="1" adaptiveColors="simple">
+        <mxGraphModel dx="1192" dy="629" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" background="#FFFFFF" math="0" shadow="1" adaptiveColors="simple">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -164,16 +164,16 @@
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="420" value="NumMorbidades" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=light-dark(#e9e8e8, #ededed);horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;html=1;strokeColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;gradientColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="-478" y="580" width="210" height="104" as="geometry"/>
+                    <mxGeometry x="-478" y="580" width="210" height="106" as="geometry"/>
                 </mxCell>
                 <mxCell id="421" value="id_uuid&amp;nbsp; &amp;nbsp;VARCHAR&amp;nbsp; &amp;nbsp; &amp;nbsp;[fk]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=12;fontColor=default;fontStyle=0;" parent="420" vertex="1">
                     <mxGeometry y="26" width="210" height="26" as="geometry"/>
                 </mxCell>
                 <mxCell id="422" value="id_institution&amp;nbsp; &amp;nbsp;INTEGER&amp;nbsp; &amp;nbsp;[fk]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=12;fontColor=default;fontStyle=0;" parent="420" vertex="1">
-                    <mxGeometry y="52" width="210" height="26" as="geometry"/>
+                    <mxGeometry y="52" width="210" height="28" as="geometry"/>
                 </mxCell>
                 <mxCell id="423" value="soma_morbidities&amp;nbsp; &amp;nbsp;INTEGER" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=12;fontColor=default;fontStyle=0;" parent="420" vertex="1">
-                    <mxGeometry y="78" width="210" height="26" as="geometry"/>
+                    <mxGeometry y="80" width="210" height="26" as="geometry"/>
                 </mxCell>
                 <mxCell id="425" style="edgeStyle=elbowEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="374" target="422" edge="1">
                     <mxGeometry relative="1" as="geometry">
