@@ -1,13 +1,40 @@
 import os
 import re
 import pandas as pd
-import matplotlib
-import matplotlib.pyplot as plt
+
+
 import numpy as np
 import seaborn as sns
-import textwrap # serve para formatar textos, ajustando-os para caber em uma largura específica, com a possibilidade de quebrar linhas e aplicar recuo.
-from matplotlib.ticker import MaxNLocator
+
+
 # ----------------------------------------
+
+# --------------------
+# Configurações Globais dos Gráficos
+# ---------------------
+
+def plot_config():
+    import seaborn as sns
+    import matplotlib
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    # Novo padrão do seaborn
+    sns.set_theme(style="whitegrid")
+
+    # Tamanho padrão das figuras
+    plt.rcParams['figure.figsize'] = (10, 6)
+
+    # Mostrar todas as linhas e colunas do pandas
+    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_colwidth', None)
+
+    # usando matplotlib
+    matplotlib.rc('font', size=10)  
+
+    return
+
+#--------------
 
 def salvar_tabela_como_imagem(df, caminho_arquivo, titulo=None, largura_max_coluna=30):
     """ Salva a tabela gerada em .png.
@@ -17,6 +44,8 @@ def salvar_tabela_como_imagem(df, caminho_arquivo, titulo=None, largura_max_colu
         - title: string com o título da tabela (opcional)
         - largura_max_coluna=30: define a largura das colunas da tabela
     """
+    import textwrap # serve para formatar textos, ajustando-os para caber em uma largura específica, com a possibilidade de quebrar linhas e aplicar recuo.
+    import matplotlib.pyplot as plt
 
     # Copiar DataFrame e aplicar quebra de linha
     df_wrapped = df.copy()
@@ -87,6 +116,9 @@ def plot_barh(data, title, xlabel, ylabel, filename, obs=2, show_text=True, show
     - show_text: se True, exibe observação adicional no gráfico.
     - show_values: se True, exibe os percentuais nas barras.
     """
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import MaxNLocator
+
     # Paleta de cores personalizada
     all_colors = ["#4E5EA7", '#F28E2B', "#AF3739", '#76B7B2', '#59A14F', '#EDC948']
     color = all_colors[:obs] if isinstance(all_colors, list) else all_colors
@@ -140,6 +172,9 @@ def plot_percentual_por_ilpi(pivot_df: pd.DataFrame, output_path: str, title=str
     - output_path: str
         Caminho do arquivo para salvar a imagem do gráfico (ex: '../plots/nome_do_arquivo.png').
     """
+
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import MaxNLocator
 
     # Calcula os percentuais por ILPI (linha)
     pivot_percent = pivot_df.div(pivot_df.sum(axis=1), axis=0) * 100
@@ -323,6 +358,9 @@ def plot_bar_flex_unificado(data, title, xlabel, ylabel, filename,
     - col_grupo: coluna de agrupamento (para gráfico empilhado)
     - xtick_rotation: rotação dos rótulos no eixo X
     """
+
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import MaxNLocator
 
     custom_colors = [
         '#4E79A7', "#092436", "#A7794C", "#E6811C",

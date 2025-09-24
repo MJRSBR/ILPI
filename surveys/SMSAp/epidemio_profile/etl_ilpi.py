@@ -2,6 +2,8 @@
 import pandas as pd
 import uuid
 import logging
+
+# Garantir a integridade dos dados paraanálises estatísticas ou modelos de machine learning posteriores.
 # %%
 ## ----------------------
 ## Função para gerar UUIDv5 a partir do CPF
@@ -48,12 +50,33 @@ def etl_df_redcap(df, campos_chave, campo_discriminador="institution_name"):
    
     return df
 
+# --------------------
+# Funções de processamento
+# --------------------
 
 def preparar_dados_residentes(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    ''''
+    Preparar um DataFrame com informações de residentes para uso em análises ou modelagens, assegurando:
+     - Presença de colunas essenciais
+     - Tipagem correta de dados
+     - Eliminação de registros inválidos ou duplicados 
+
+    Parâmetros:
+    - df (pd.DataFrame): DataFrame original.
+
+    Retorna:
+    - Retorna dois DataFrames:
+        - residentes: dados prontos e limpos
+        - duplicados_df: registros identificados como duplicados
+
+    Tratamento de erros:
+    - Qualquer erro na execução gera log de erro e a função retorna dois DataFrames vazios.    
+    '''
     logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
 
     try:
         # --- Configurações iniciais ---
+        # Validação de colunas obrigatórias
         colunas_necessarias = [
             "id_institution", "institution_name", "record_id", "uuidv5",
             "full_name", "date_of_birth", "elder_age", "sex", 
@@ -104,9 +127,7 @@ def preparar_dados_residentes(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFr
     
 
 
-# --------------------
-# Funções de processamento
-# --------------------
+
 
 # AJUSTAR#################################################
 
@@ -166,7 +187,10 @@ def limpar_e_converter_colunas(df: pd.DataFrame, colunas_tipos: dict) -> pd.Data
 
     return df    
 # %%
+# --------------------
 # Lendo o arquivo .csv do REDCap
+# --------------------
+# 
 df = pd.read_csv("../../../../data/SMSAp/ILPI/PerfilEpidemiolgicos_DATA_2025-09-17_1151.csv",
                  sep=";")
 df.head()
