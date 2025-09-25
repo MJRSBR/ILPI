@@ -19,6 +19,8 @@ def plot_config():
     import matplotlib.pyplot as plt
     import pandas as pd
 
+    from matplotlib.ticker import MaxNLocator
+
     # Novo padrão do seaborn
     sns.set_theme(style="whitegrid")
 
@@ -101,13 +103,72 @@ def salvar_tabela_como_imagem(df, caminho_arquivo, titulo=None, largura_max_colu
 
 # ----------------------------------------
 
+# def plot_barh(data, title, xlabel, ylabel, filename, obs=2, show_text=True, show_values=True):
+#     """
+#     Gera um gráfico de barras horizontal com valores percentuais centralizados nas barras
+#     e o eixo X em valores absolutos.
+
+#     Parâmetros:
+#     - data: DataFrame do pandas (colunas devem corresponder às categorias).
+#     - title: string com o título do gráfico.
+#     - xlabel: string com o rótulo do eixo X.
+#     - ylabel: string com o rótulo do eixo Y.
+#     - filename: string com o caminho e nome do arquivo (ex: 'plots/exemplo.png')
+#     - obs: número de observações (define quantas cores usar).
+#     - show_text: se True, exibe observação adicional no gráfico.
+#     - show_values: se True, exibe os percentuais nas barras.
+#     """
+#     import matplotlib.pyplot as plt
+#     from matplotlib.ticker import MaxNLocator
+
+#     # Paleta de cores personalizada
+#     all_colors = ["#4E5EA7", '#F28E2B', "#AF3739", '#76B7B2', '#59A14F', '#EDC948']
+#     color = all_colors[:obs] if isinstance(all_colors, list) else all_colors
+
+#     # Cálculo dos percentuais por linha (ILPI)
+#     percent_df = data.div(data.sum(axis=1), axis=0) * 100
+
+#     # Plot
+#     ax = data.plot(kind='barh', color=color, figsize=(10, 6))
+#     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+#     plt.title(title)
+#     plt.xlabel(xlabel)
+#     plt.ylabel(ylabel)
+
+#     # Inserção dos percentuais nas barras
+#     if show_values:
+#         for col_idx, container in enumerate(ax.containers):
+#             col_name = data.columns[col_idx]
+#             for bar, (idx, percent) in zip(container, percent_df[col_name].items()):
+#                 width = bar.get_width()
+#                 if pd.notna(percent) and width > 0:
+#                     x = width / 2
+#                     y = bar.get_y() + bar.get_height() / 2
+#                     font_size = max(8, min(12, width * 0.25))
+#                     ax.text(x, y,
+#                             f'{percent:.1f}%',
+#                             ha='center',
+#                             va='center',
+#                             color='white',
+#                             fontweight='bold',
+#                             fontsize=font_size)
+
+#     # Observação adicional opcional
+#     if show_text:
+#         plt.text(0.075, 0.3, '* Uma das instituições é composta por unidades de moradia',
+#                  color='red', ha='left', va='bottom', transform=plt.gcf().transFigure, wrap=True)
+
+#     plt.tight_layout()
+#     plt.savefig(filename, dpi=300)
+#     plt.show()
+
 def plot_barh(data, title, xlabel, ylabel, filename, obs=2, show_text=True, show_values=True):
     """
     Gera um gráfico de barras horizontal com valores percentuais centralizados nas barras
     e o eixo X em valores absolutos.
 
     Parâmetros:
-    - data: DataFrame do pandas (colunas devem corresponder às categorias).
+    - data: DataFrame OU Series (pandas).
     - title: string com o título do gráfico.
     - xlabel: string com o rótulo do eixo X.
     - ylabel: string com o rótulo do eixo Y.
@@ -116,14 +177,20 @@ def plot_barh(data, title, xlabel, ylabel, filename, obs=2, show_text=True, show
     - show_text: se True, exibe observação adicional no gráfico.
     - show_values: se True, exibe os percentuais nas barras.
     """
+    import pandas as pd
     import matplotlib.pyplot as plt
     from matplotlib.ticker import MaxNLocator
+
+    # 🛠️ Se for Series, converte para DataFrame de 1 linha com as categorias como colunas
+    if isinstance(data, pd.Series):
+        data = data.to_frame().T
+        data.index = ['']  # Remove o índice numérico (evita aparecer "0" ou "count" no eixo Y)
 
     # Paleta de cores personalizada
     all_colors = ["#4E5EA7", '#F28E2B', "#AF3739", '#76B7B2', '#59A14F', '#EDC948']
     color = all_colors[:obs] if isinstance(all_colors, list) else all_colors
 
-    # Cálculo dos percentuais por linha (ILPI)
+    # Cálculo dos percentuais por linha
     percent_df = data.div(data.sum(axis=1), axis=0) * 100
 
     # Plot
@@ -153,7 +220,7 @@ def plot_barh(data, title, xlabel, ylabel, filename, obs=2, show_text=True, show
 
     # Observação adicional opcional
     if show_text:
-        plt.text(0.075, 0.3, '* Uma das instituições é composta por unidades de moradia',
+        plt.text(0.075, 0.25, '* Uma das instituições é composta por unidades de moradia',
                  color='red', ha='left', va='bottom', transform=plt.gcf().transFigure, wrap=True)
 
     plt.tight_layout()

@@ -126,7 +126,7 @@
 # %%
 import sqlite3
 import pandas as pd
-from surveys.SMSAp.ILPI.src.ingestion import importar_todos_csvs
+from utils.ingestion import importar_todos_csvs
 # Criação do banco de dados SQLite
 conn = sqlite3.connect('ilpi.db')
 cursor = conn.cursor()

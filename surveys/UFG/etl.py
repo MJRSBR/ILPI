@@ -3,7 +3,7 @@
 import pandas as pd
 
 # %%
-df = pd.read_csv("../../../../data/UFG/MonitoramentoEDiagns_DATA_2024-11-27_1052.csv")
+df = pd.read_csv("../../../data/UFG/MonitoramentoEDiagns_DATA_2024-11-27_1052.csv")
 df.head()
 # %%
 df.columns
@@ -15,6 +15,6 @@ df.head()
 
 # %%
 
-df.to_csv("../../../../data/UFG/base_ilpi.csv")
+df.to_csv("../../../data/UFG/base_ilpi.csv", index=False)
 
 # %%

@@ -82,8 +82,6 @@ CREATE TABLE mpiScore (
 );
 
 
-,
-
 
 
 

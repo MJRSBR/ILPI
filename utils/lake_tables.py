@@ -3,7 +3,7 @@ import sys
 sys.path.append('/Users/mjrs/Library/CloudStorage/OneDrive-Pessoal/UFG/Projeto_VIDAEPAUTA/Códigos/ILPI')
 import re
 import pandas as pd
-from etl_ilpi import preparar_dados_residentes, limpar_e_converter_colunas
+from surveys.SMSAp.epidemio_profile.etl_ilpi import preparar_dados_residentes, limpar_e_converter_colunas
 from funcoes.f_process import extrair_morbidades, extrair_medicamentos, extrair_medicamentos_incluindo_vazios
 # %%
 

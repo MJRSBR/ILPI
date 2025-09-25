@@ -1,10 +1,26 @@
 # %%
+import sys
+sys.path.append('/Users/mjrs/Library/CloudStorage/OneDrive-Pessoal/UFG/Projeto_VIDAEPAUTA/Códigos/ILPI')
+# %%
 # --------------------
 # Bibliotecas
+# --------------------
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from matplotlib.ticker import MaxNLocator
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+# from matplotlib.ticker import MaxNLocator
+
+from utils.utils import criar_diretorios
+from funcoes.f_plot import plot_config, plot_barh
+# %%
+# ------------------------------
+# Carregando configuraçoes e utilitários
+# ------------------------------
+# Configuraçao dos gráficos
+plot_config()
+
+# Cria diretórios para plots e tabelas
+criar_diretorios()
 # %%
 # ---------------------
 # Leitura dos dados
@@ -12,10 +28,7 @@ df = pd.read_csv('../../../../data/UFG/base_ilpi.csv')
 df
 # %%
 # ---------------------
-# Configurações Globais dos Gráficos
-sns.set(style="whitegrid")
-plt.rcParams['figure.figsize'] = (10, 6)
-# %%
+#
 # ---------------------
 # Função para plotar gráficos de barras horizontais de binários (Sim ou Não)
 def plot_barh(data, title, xlabel, filename, color=['#4E79A7', '#F28E2B']):
