@@ -30,7 +30,8 @@ df = pd.read_csv('../../../data/UFG/base_ilpi.csv')
 df
 # %%
 # Renomeando a coluna institution_name para id_institution
-df['institution_name'].rename('id_institution', inplace=True) 
+df.rename(columns={'institution_name':'id_institution'}, inplace=True)
+df
 
 # %%
 # ---------------------

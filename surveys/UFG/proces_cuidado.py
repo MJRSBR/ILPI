@@ -6,12 +6,12 @@ sys.path.append('/Users/mjrs/Library/CloudStorage/OneDrive-Pessoal/UFG/Projeto_V
 # Bibliotecas
 # --------------------
 import pandas as pd
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 # import seaborn as sns
-# from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import MaxNLocator
 
 from utils.utils import criar_diretorios
-from funcoes.f_plot import plot_config, plot_barh
+from funcoes.f_plot import plot_config, salvar_tabela_como_imagem
 # %%
 # ------------------------------
 # Carregando configuraçoes e utilitários
@@ -28,20 +28,26 @@ df = pd.read_csv('../../../../data/UFG/base_ilpi.csv', index=False)
 df
 # %%
 # Renomeando a coluna institution_name para id_institution
-df['institution_name'].rename('id_institution', inplace=True) 
+df.rename(columns={'institution_name':'id_institution'}, inplace=True)
+df
 # %%
 # Processos de Cuidado
 # Área para que o residente possa tomar um banho de sol
 # ---------------------
-banho_sol = (df[["institution_name", "sunbathing"]]
+banho_sol = (df[["id_institution", "sunbathing"]]
                    .assign(df_filtered=df["sunbathing"].map({1: "Sim", 2: "Não"}))
-                   [["institution_name", "df_filtered"]]
-                .rename(columns={"institution_name": "ILPI", "df_filtered": "banho_sol"})
+                   [["id_institution", "df_filtered"]]
+                .rename(columns={"id_institution": "ILPI", "df_filtered": "banho_sol"})
 )
 
 banho_sol
 # %%
-# Gráfico 32 - Área banho de sol
+salvar_tabela_como_imagem(
+    banho_sol,
+    '../../UFG/tables/35_banho_sol.png'
+)
+# %%
+# Gráfico 35 - Área banho de sol
 # --------------------------
 plt.figure(figsize=(10, 6))
 
@@ -65,20 +71,25 @@ plt.xlabel('ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
-plt.savefig("32_banho_sol.png")
+plt.savefig("../../UFG/plots/35_banho_sol.png")
 plt.show()
 # %%
 # Área recebimento de visitas e familiares
 # ----------------------
-area_vis_familia = (df[["institution_name", "visiting_area"]]
+area_vis_familia = (df[["id_institution", "visiting_area"]]
                    .assign(df_filtered=df["visiting_area"].map({1: "Sim", 2: "Não"}))
-                   [["institution_name", "df_filtered"]]
-                .rename(columns={"institution_name": "ILPI", "df_filtered": "area_vis_familia"})
+                   [["id_institution", "df_filtered"]]
+                .rename(columns={"id_institution": "ILPI", "df_filtered": "area_vis_familia"})
 )
 
 area_vis_familia
 # %%
-# Gráfico 33 - Área recebimento de visitas e familiares
+salvar_tabela_como_imagem(
+    area_vis_familia,
+    '../../UFG/tables/36_area_vis_familia.png'
+)
+# %%
+# Gráfico 36 - Área recebimento de visitas e familiares
 # --------------------------
 plt.figure(figsize=(10, 6))
 
@@ -102,21 +113,26 @@ plt.xlabel('ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
-plt.savefig("33_area_vis_familia.png")
+plt.savefig("../../UFG/plots/36_area_vis_familia.png")
 plt.show()
 # %%
 
 # Área de atividades sociais
 # ---------------------
-area_ativ_social = (df[["institution_name", "social_area"]]
+area_ativ_social = (df[["id_institution", "social_area"]]
                    .assign(df_filtered=df["social_area"].map({1: "Sim", 2: "Não"}))
-                   [["institution_name", "df_filtered"]]
-                .rename(columns={"institution_name": "ILPI", "df_filtered": "area_ativ_social"})
+                   [["id_institution", "df_filtered"]]
+                .rename(columns={"id_institution": "ILPI", "df_filtered": "area_ativ_social"})
 )
 
 area_ativ_social
 # %%
-# Gráfico 34 - Área de atividades sociais
+salvar_tabela_como_imagem(
+    area_ativ_social,
+    '../../UFG/tables/37_area_ativ_social.png'
+)
+# %%
+# Gráfico 37 - Área de atividades sociais
 # --------------------------
 plt.figure(figsize=(10, 6))
 
@@ -140,20 +156,25 @@ plt.xlabel('ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
-plt.savefig("34_area_ativ_social.png")
+plt.savefig("../../UFG/plots/37_area_ativ_social.png")
 plt.show()
 # %%
 # Música ambiente na ILPI
 # ---------------------------
-musica_ambiente = (df[["institution_name", "ambient_music"]]
+musica_ambiente = (df[["id_institution", "ambient_music"]]
                    .assign(df_filtered=df["ambient_music"].map({1: "Sim", 2: "Não"}))
-                   [["institution_name", "df_filtered"]]
-                .rename(columns={"institution_name": "ILPI", "df_filtered": "musica_ambiente"})
+                   [["id_institution", "df_filtered"]]
+                .rename(columns={"id_institution": "ILPI", "df_filtered": "musica_ambiente"})
 )
 
 musica_ambiente
 # %%
-# Gráfico 35 - Área de atividades sociais
+salvar_tabela_como_imagem(
+    musica_ambiente,
+    '../../UFG/tables/38_musica_ambiente.png'
+)
+# %%
+# Gráfico 38 - Área de atividades sociais
 # --------------------------
 plt.figure(figsize=(10, 6))
 
@@ -177,20 +198,25 @@ plt.xlabel('ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
-plt.savefig("35_musica_ambiente.png")
+plt.savefig("../../UFG/plots/38_musica_ambiente.png")
 plt.show()
 # %%
 # Cardápio visível para consulta
 # ---------------------------
-cardapio_visivel = (df[["institution_name", "menu"]]
+cardapio_visivel = (df[["id_institution", "menu"]]
                    .assign(df_filtered=df["menu"].map({1: "Sim", 2: "Não"}))
-                   [["institution_name", "df_filtered"]]
-                .rename(columns={"institution_name": "ILPI", "df_filtered": "cardapio_visivel"})
+                   [["id_institution", "df_filtered"]]
+                .rename(columns={"id_institution": "ILPI", "df_filtered": "cardapio_visivel"})
 )
 
 cardapio_visivel
 # %%
-# Gráfico 36 - Cardápio visível para consulta
+salvar_tabela_como_imagem(
+    cardapio_visivel,
+    '../../UFG/tables/39_cardapio_visivel.png'
+)
+# %%
+# Gráfico 39 - Cardápio visível para consulta
 # --------------------------
 plt.figure(figsize=(10, 6))
 
@@ -214,20 +240,26 @@ plt.xlabel('ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
-plt.savefig("36_cardapio_visivel.png")
+plt.savefig("../../UFG/plots/39_cardapio_visivel.png")
 plt.show()
 # %%
 # Frequência que o cardápio é atualizado
 # ----------------------------------
-freq_atualiz_cardapio = (df[["institution_name", "semanal_menu"]]
+freq_atualiz_cardapio = (df[["id_institution", "semanal_menu"]]
                    .assign(df_filtered=df["semanal_menu"].map({1: "Sim", 2: "Não"}))
-                   [["institution_name", "df_filtered"]]
-                .rename(columns={"institution_name": "ILPI", "df_filtered": "atualiz_cardapio"})
+                   [["id_institution", "df_filtered"]]
+                   .rename(columns={"id_institution": "ILPI", "df_filtered": "atualiz_cardapio"})
+                   .fillna("Não é informado")
 )
 
-freq_atualiz_cardapio
+freq_atualiz_cardapio 
 # %%
-# Gráfico 37 - Cardápio visível para consulta
+salvar_tabela_como_imagem(
+    freq_atualiz_cardapio,
+    '../../UFG/tables/40_freq_atualiz_cardapio.png'
+)
+# %%
+# Gráfico 40 - Cardápio visível para consulta
 # --------------------------
 plt.figure(figsize=(10, 6))
 
@@ -251,12 +283,12 @@ plt.xlabel('ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
-plt.savefig("37_atualiz_cardapio.png")
+plt.savefig("../../UFG/plots/40_atualiz_cardapio.png")
 plt.show()
 # %%
 # Realização de oficinas e atividades
 # ---------------------------
-oficinas_atividades = (df[["institution_name", "recreation_type___1", "recreation_type___2", "recreation_type___3",
+oficinas_atividades = (df[["id_institution", "recreation_type___1", "recreation_type___2", "recreation_type___3",
                       "recreation_type___4", "recreation_type___5", "recreation_type___6", "recreation_type___7"]]
                   .assign(
                         oficinas_atividades_list=(
@@ -270,15 +302,21 @@ oficinas_atividades = (df[["institution_name", "recreation_type___1", "recreatio
                         )
                   )
                   .assign(oficinas_atividades_list=lambda x: x['oficinas_atividades_list'].str.lstrip(', '))  # Limpar vírgula no início da string
-                  .rename(columns={"institution_name": "ILPI"})  # Renomeando a coluna
+                  .rename(columns={"id_institution": "ILPI"})  # Renomeando a coluna
                   [["ILPI", "oficinas_atividades_list"]]  # Selecionando apenas as colunas finais
 )
 
 oficinas_atividades
 
 # %%
+salvar_tabela_como_imagem(
+    oficinas_atividades,
+    '../../UFG/tables/41_oficinas_atividades.png'
+)
+# %%
+
 # --------------------
-# Gráfico 38 - Realização de oficinas e atividades
+# Gráfico 41 - Realização de oficinas e atividades
 
 plt.figure(figsize=(10, 6))
 
@@ -302,5 +340,6 @@ plt.xlabel('ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
-plt.savefig("38_oficinas_atividades.png")
+plt.savefig("../../UFG/plots/41_oficinas_atividades.png")
 plt.show()
+# %%

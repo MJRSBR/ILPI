@@ -6,12 +6,12 @@ sys.path.append('/Users/mjrs/Library/CloudStorage/OneDrive-Pessoal/UFG/Projeto_V
 # Bibliotecas
 # --------------------
 import pandas as pd
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 # import seaborn as sns
-# from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import MaxNLocator
 
 from utils.utils import criar_diretorios
-from funcoes.f_plot import plot_config, plot_barh
+from funcoes.f_plot import plot_config, salvar_tabela_como_imagem
 # %%
 # ------------------------------
 # Carregando configuraçoes e utilitários
@@ -28,22 +28,29 @@ df = pd.read_csv('../../../../data/UFG/base_ilpi.csv')
 df
 # %%
 # Renomeando a coluna institution_name para id_institution
-df['institution_name'].rename('id_institution', inplace=True) 
+df.rename(columns={'institution_name':'id_institution'}, inplace=True)
+df
 # %%
 # ---------------------
 # Serviço Lavanderia
 # Separação de roupas limpas e sujas
 
-roupa_segreg = (df[["institution_name", "dirty_clothing_segregation"]]
+roupa_segreg = (df[["id_institution", "dirty_clothing_segregation"]]
                 .assign(df_filtered=df["dirty_clothing_segregation"].map({1: "Sim", 2: "Não"}))
-                [["institution_name", "df_filtered"]]
-                .rename(columns={"institution_name": "ILPI", "df_filtered": "Separacao_roupas_sujas_limpas"})
+                [["id_institution", "df_filtered"]]
+                .rename(columns={"id_institution": "ILPI", "df_filtered": "Separacao_roupas_sujas_limpas"})
 )
 
 roupa_segreg
 # %%
+# Salvando a tabela em /tables
+salvar_tabela_como_imagem(
+    roupa_segreg,
+    '../../UFG/tables/31_roupa_segreg.png'
+)
+# %%
 # -------------------------
-# Gráfico 28 - Separação de roupas limpas e sujas
+# Gráfico 31 - Separação de roupas limpas e sujas
 
 plt.figure(figsize=(10, 6))
 
@@ -67,12 +74,12 @@ plt.xlabel('ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
-plt.savefig("28_roupa_segreg.png")
+plt.savefig("../../UFG/plots/31_roupa_segreg.png")
 plt.show()
 # %%
 # Frequência de troca de roupas de cama e toalhas
 
-freq_troca_roupa_cama = (df[["institution_name", "dirty_clothing_change"]]
+freq_troca_roupa_cama = (df[["id_institution", "dirty_clothing_change"]]
                   .assign(
                         freq_troca_roupa_cama_list=(
                               df["dirty_clothing_change"].map(lambda x: 'diario' if x == 1 else '') +
@@ -82,14 +89,21 @@ freq_troca_roupa_cama = (df[["institution_name", "dirty_clothing_change"]]
                         )
                   )
                   .assign(freq_troca_roupa_cama_list=lambda x: x['freq_troca_roupa_cama_list'].str.lstrip(', '))  # Limpar vírgula no início da string
-                  .rename(columns={"institution_name": "ILPI"})  # Renomeando a coluna
+                  .rename(columns={"id_institution": "ILPI"})  # Renomeando a coluna
                   [["ILPI", "freq_troca_roupa_cama_list"]]  # Selecionando apenas as colunas finais
 )
 
 freq_troca_roupa_cama
 # %%
+
+# Salvando a tabela em /tables
+salvar_tabela_como_imagem(
+    freq_troca_roupa_cama,
+    '../../UFG/tables/32_freq_troca_roupa_cama.png'
+)
+# %%
 # --------------------
-# Gráfico 29 - Frequência de troca de roupas de cama e toalhas
+# Gráfico 32 - Frequência de troca de roupas de cama e toalhas
 
 plt.figure(figsize=(10, 6))
 
@@ -113,5 +127,7 @@ plt.xlabel('ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
-plt.savefig("29_freq_troca_roupa_cama.png")
+plt.savefig("../../UFG/plots/32_freq_troca_roupa_cama.png")
 plt.show()
+
+# %%

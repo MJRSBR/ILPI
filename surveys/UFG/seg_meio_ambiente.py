@@ -25,11 +25,12 @@ os.makedirs('../../UFG/plots', exist_ok=True)
 # %%
 # ---------------------
 # Leitura dos dados
-df = pd.read_csv('../../../../data/UFG/base_ilpi.csv')
+df = pd.read_csv('../../../data/UFG/base_ilpi.csv')
 df
 # %%
 # Renomeando a coluna institution_name para id_institution
-df['institution_name'].rename('id_institution', inplace=True) 
+df.rename(columns={'institution_name':'id_institution'}, inplace=True)
+df
 # %%
 # ---------------------
 # SEGURANÇA E MEIO AMBIENTE
@@ -118,7 +119,7 @@ plt.xlabel('ILPIS')
 plt.ylabel('Tipo de Sistema de Segurança')
 
 # Exibir gráfico
-plt.savefig("08_tipos_sist_seg.png")
+plt.savefig("../../UFG/plots/09_tipos_sist_seg.png")
 plt.show()
 
 #tipos_sist_seg_counts = tipos_sist_seg['tipos_sist_seguranca'].value_counts()
@@ -195,7 +196,7 @@ salvar_tabela_como_imagem(
 )
 # %%
 # -------------------
-# Gráfico 11 - iluminação adequada
+# Gráfico 12 - iluminação adequada
 
 #iluminacao_counts = iluminacao['Iluminacao_adequada'].value_counts()
 
@@ -247,7 +248,7 @@ salvar_tabela_como_imagem(
 )
 # %%
 # ------------------
-# Gráfico 11 - Ventilação Adequada
+# Gráfico 12 - Ventilação Adequada
 # Tamanho da figura
 plt.figure(figsize=(10,6))
 
@@ -289,11 +290,9 @@ pintura_quartos
 # Salvando a tabela em /tables
 salvar_tabela_como_imagem(
     pintura_quartos,
-    '../../UFG/tables/13_qtde_residentes.png'
+    '../../UFG/tables/13_pintura_quarto.png'
 )
 # %%
-
-######### PAREI AQUI 25/09
 # ---------------------
 # Gráfico 13 - Pintura quartos tons pastéis
 #  -------------------
@@ -301,7 +300,7 @@ salvar_tabela_como_imagem(
 plt.figure(figsize=(10,6))
 
 # Agrupar e plotar o g'rafico de barras horizontais
-ventilacao.groupby("painting_color").size().plot(
+pintura_quartos.groupby("Pintura_tons_pasteis").size().plot(
     kind="barh",
     color=['#4E79A7', '#F28E2B']
 )
@@ -314,7 +313,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 
 # Títulos e rótulos
 plt.title("A pintura do quarto é adequada?")
-plt.text(0.02, 1.3, '* Uma das instituíções é composta por unidades de moradia',
+plt.text(0.02, 0.3, '* Uma das instituíções é composta por unidades de moradia',
          color='red', ha='left', va='bottom', wrap=True)
 plt.xlabel('ILPIs')
 plt.ylabel('')
@@ -343,6 +342,12 @@ acessib_quarto = (df[["id_institution", "room_access___1", "room_access___2", "r
 
 acessib_quarto
 # %%
+# Salvando a tabela em /tables
+salvar_tabela_como_imagem(
+    acessib_quarto,
+    '../../UFG/tables/14_acess_quarto.png'
+)
+# %%
 # -------------------
 # Gráfico 13 - Acessíbilidade do quarto
 # Tamanho da figura
@@ -368,7 +373,7 @@ plt.xlabel('ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
-plt.savefig("13_acessib_quarto.png")
+plt.savefig("../../UFG/plots/14_acessib_quarto.png")
 plt.show()
 # %%
 # --------------------
@@ -389,8 +394,14 @@ acessib_banheiro = (df[["id_institution", "bathroom_access___1", "bathroom_acces
 
 acessib_banheiro
 # %%
+# Salvando a tabela em /tables
+salvar_tabela_como_imagem(
+    acessib_banheiro,
+    '../../UFG/tables/15_acess_banheiro.png'
+)
+# %%
 # -------------------
-# Gráfico 14 - Acessíbilidade do banheiro
+# Gráfico 15 - Acessíbilidade do banheiro
 # Tamanho da figura
 plt.figure(figsize=(10, 6))
 
@@ -414,7 +425,7 @@ plt.xlabel('ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
-plt.savefig("14_acessib_banheiro.png")
+plt.savefig("../../UFG/plots/15_acessib_banheiro.png")
 plt.show()
 # %%
 # Refeitório
@@ -434,8 +445,14 @@ acessib_refeitorio = (df[["id_institution", "cafeteria___1", "cafeteria___2", "c
 
 acessib_refeitorio
 # %%
+# Salvando a tabela em /tables
+salvar_tabela_como_imagem(
+    acessib_refeitorio,
+    '../../UFG/tables/16_acess_refeitorio.png'
+)
+# %%
 # -------------------
-# Gráfico 15 - Acessíbilidade do refeitório
+# Gráfico 16 - Acessíbilidade do refeitório
 # Tamanho da figura
 plt.figure(figsize=(10, 6))
 
@@ -459,7 +476,7 @@ plt.xlabel('ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
-plt.savefig("15_acessib_refeitorio.png")
+plt.savefig("../../UFG/plots/16_acessib_refeitorio.png")
 plt.show()
 # %%
 # Outras áreas
@@ -479,8 +496,14 @@ acessib_outras_areas = (df[["id_institution", "other_areas___1", "other_areas___
 
 acessib_outras_areas
 # %%
+# Salvando a tabela em /tables
+salvar_tabela_como_imagem(
+    acessib_outras_areas,
+    '../../UFG/tables/17_acess_outras_areas.png'
+)
+# %%
 # -------------------
-# Gráfico 16 - Acessíbilidade de outras áreas
+# Gráfico 17 - Acessíbilidade de outras áreas
 # Tamanho da figura
 plt.figure(figsize=(10, 6))
 
@@ -504,7 +527,7 @@ plt.xlabel('ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
-plt.savefig("16_acessib_outras_areas.png")
+plt.savefig("../../UFG/plots/17_acessib_outras_areas.png")
 plt.show()
 # %%
 # ------------------------
@@ -517,6 +540,11 @@ quadro_geral_acessib = (acessib_quarto.merge(acessib_banheiro, on="ILPI", how="r
 quadro_geral_acessib
 
 # %%
+# Salvando a tabela em /tables
+salvar_tabela_como_imagem(
+    quadro_geral_acessib,
+    '../../UFG/tables/18_quadro_geral_acess.png'
+)
 # -----------------------
 # Os profissionais da ILPI utilizam qualquer tipo de EPI's, durante no cuidado com os idosos
 
@@ -528,8 +556,14 @@ uso_epi = (df[["id_institution", "epi_use"]]
 
 uso_epi
 # %%
+# Salvando a tabela em /tables
+salvar_tabela_como_imagem(
+    uso_epi,
+    '../../UFG/tables/19_uso_epi.png'
+)
+# %%
 # ----------------
-# Gráfico 17 - Uso de Equipamento de Proteção Individual
+# Gráfico 19 - Uso de Equipamento de Proteção Individual
 
 #uso_epi_counts = uso_epi["Uso_equip_prot_individual"].value_counts()
 
@@ -562,5 +596,6 @@ plt.xlabel('ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
-plt.savefig("17_uso_epi.png")
+plt.savefig("../../UFG/plots/19_uso_epi.png")
 plt.show()
+# %%

@@ -6,12 +6,12 @@ sys.path.append('/Users/mjrs/Library/CloudStorage/OneDrive-Pessoal/UFG/Projeto_V
 # Bibliotecas
 # --------------------
 import pandas as pd
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 # import seaborn as sns
-# from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import MaxNLocator
 
 from utils.utils import criar_diretorios
-from funcoes.f_plot import plot_config, plot_barh
+from funcoes.f_plot import plot_config, salvar_tabela_como_imagem
 # %%
 # ------------------------------
 # Carregando configuraçoes e utilitários
@@ -28,21 +28,28 @@ df = pd.read_csv('../../../../data/UFG/base_ilpi.csv')
 df
 # %%
 # Renomeando a coluna institution_name para id_institution
-df['institution_name'].rename('id_institution', inplace=True) 
+df.rename(columns={'institution_name':'id_institution'}, inplace=True)
+df
 # %%
 # Gerenciamento Resíduos
 # ---------------------------
 # Separação do lixo (orgânico/reciclável)
 
-reciclagem_lixo = (df[["institution_name", "trash_recicling"]]
+reciclagem_lixo = (df[["id_institution", "trash_recicling"]]
                    .assign(df_filtered=df["trash_recicling"].map({1: "Sim", 2: "Não"}))
-                   [["institution_name", "df_filtered"]]
-                .rename(columns={"institution_name": "ILPI", "df_filtered": "Reciclagem_lixo"})
+                   [["id_institution", "df_filtered"]]
+                .rename(columns={"id_institution": "ILPI", "df_filtered": "Reciclagem_lixo"})
 )
 
 reciclagem_lixo
 # %%
-# Gráfico 30 - Reciclagem de lixo
+# Salvando a tabela em /tables
+salvar_tabela_como_imagem(
+    reciclagem_lixo,
+    '../../UFG/tables/33_reciclagem_lixo.png'
+)
+# %%
+# Gráfico 33 - Reciclagem de lixo
 # --------------------------
 plt.figure(figsize=(10, 6))
 
@@ -66,13 +73,13 @@ plt.xlabel('ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
-plt.savefig("30_reciclagem_lixo.png")
+plt.savefig("../../UFG/plots/33_reciclagem_lixo.png")
 plt.show()
 # %%
 # Recipientes adequados e devidamente rotulados para descarte dos diferentes tipos de resíduos
 # ---------------------------
 
-container_adequados = (df[["institution_name", "trash_container___1", "trash_container___2", "trash_container___3", 
+container_adequados = (df[["id_institution", "trash_container___1", "trash_container___2", "trash_container___3", 
                            "trash_container___4","trash_container___5"]]
                   .assign(
                         container_adequados_list=(
@@ -84,14 +91,20 @@ container_adequados = (df[["institution_name", "trash_container___1", "trash_con
                         )
                   )
                   .assign(container_adequados_list=lambda x: x['container_adequados_list'].str.lstrip(', '))  # Limpar vírgula no início da string
-                  .rename(columns={"institution_name": "ILPI"})  # Renomeando a coluna
+                  .rename(columns={"id_institution": "ILPI"})  # Renomeando a coluna
                   [["ILPI", "container_adequados_list"]]  # Selecionando apenas as colunas finais
 )
 
 container_adequados
 # %%
+# Salvando a tabela em /tables
+salvar_tabela_como_imagem(
+    container_adequados,
+    '../../UFG/tables/34_container_adequados.png'
+)
+# %%
 # --------------------
-# Gráfico 31 - Recipientes adequados e devidamente rotulados para descarte dos diferentes
+# Gráfico 34 - Recipientes adequados e devidamente rotulados para descarte dos diferentes
 # tipos de resíduos
 
 plt.figure(figsize=(10, 6))
@@ -116,5 +129,6 @@ plt.xlabel('ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
-plt.savefig("31_container_adequados.png")
+plt.savefig("../../UFG/plots/34_container_adequados.png")
 plt.show()
+# %%
