@@ -69,7 +69,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Separação de lixo (orgânico/reciclável)')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -125,7 +125,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Recipientes adequados/rotulados para descarte dos diferentes tipos de resíduos')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico

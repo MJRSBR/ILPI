@@ -79,7 +79,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Medicamento dentro do prazo de validade')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -96,7 +96,6 @@ emb_viol = (df[["id_institution", "violeted_pakage"]]
             .rename(columns={"id_institution": "ILPI", "df_filtered": "Embalagem_violada"})
 )
 emb_viol
-# %%
 # %%
 # Salvando a tabela em /tables
 salvar_tabela_como_imagem(
@@ -133,7 +132,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Medicamento com embalagem violada')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -186,7 +185,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Geladeira exclusiva ao armazenamento de medicamentos')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -209,6 +208,7 @@ salvar_tabela_como_imagem(
     reg_temp_geladeira,
     '../../UFG/tables/23_reg_temp_geladeira.png'
 )
+# %%
 # ---------------------
 # Gráfico 23 - Registro temperatura da geladeira
 
@@ -238,7 +238,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Registro temperatura da geladeira')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -290,7 +290,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Registro de utilização e frequência uso medicação')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -343,7 +343,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Tipo de registro da medicação')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
          color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('Tipo de Registro')
 
 # Exibir gráfico
@@ -395,7 +395,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Substâncias Psicoativas/Psicotrópicas estão guardadas separadamente')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -444,7 +444,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Como são armazenadas as substâncias psicoativas')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -500,7 +500,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Profissional que faz a separação da medicação a ser tomada pelos idosos')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
          color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('Profissional')
 
 # Exibir gráfico
@@ -542,7 +542,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Qual é o outro profissional?')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico

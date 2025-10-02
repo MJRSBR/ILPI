@@ -58,7 +58,7 @@ sist_counts = sist_seg['Sistemas_segurança'].value_counts()
 plot_barh(
     sist_counts,
     'Existe Sistema de Segurança na ILPI?',
-    'ILPIs',
+    'Número de ILPIs',
     '',
     '../../UFG/plots/08_sistema_seguranca.png'
 )
@@ -73,11 +73,11 @@ tipos_sist_seg = (
     df[["id_institution", "security_device_type___1", "security_device_type___2", "security_device_type___3", "security_device_type___4", "security_device_type___5"]]
     .assign(
         tipos_sist_seguranca= (
-            df["security_device_type___1"].map(lambda x: 'Alarme (incêndio/violação)' if x == 1 else ', Não tem alarmes') +
-            df["security_device_type___2"].map(lambda x: ', Cameras interno' if x == 1 else ', Não tem cameras internas') +
-            df["security_device_type___3"].map(lambda x: ', Cameras externo' if x == 1 else ', Não tem cameras externas') +
-            df["security_device_type___4"].map(lambda x: ', Segurança (individuo)' if x == 1 else ', Não tem seguraça (indivíduo)') +
-            df["security_device_type___5"].map(lambda x: ', Segurança armada (indivíduo)' if x == 1 else ', Não tem segurança armada (indivíduo)') 
+            df["security_device_type___1"].map(lambda x: 'Alarme (incêndio/violação)' if x == 1 else ' ') +
+            df["security_device_type___2"].map(lambda x: ', Cameras interno' if x == 1 else '') +
+            df["security_device_type___3"].map(lambda x: ', Cameras externo' if x == 1 else '') +
+            df["security_device_type___4"].map(lambda x: ', Segurança (individuo)' if x == 1 else '') +
+            df["security_device_type___5"].map(lambda x: ', Segurança armada (indivíduo)' if x == 1 else '') 
         )
     )
     .assign(tipos_sist_seguranca=lambda x: x['tipos_sist_seguranca'].str.lstrip(', '))  # Limpar vírgula no início da string
@@ -115,7 +115,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Contagem por Tipo de Sistema de Segurança')
 plt.text(-2.5, 2.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIS')
+plt.xlabel('Número de ILPIS')
 plt.ylabel('Tipo de Sistema de Segurança')
 
 # Exibir gráfico
@@ -171,7 +171,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 
 # Adicionando título e rótulos
 plt.title('Disponibilidade de dispositivo de chamada pelo residente')
-plt.xlabel('ILPIS')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibindo o gráfico
@@ -221,7 +221,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('A iluminação é adequada?')
 plt.text(0.02, 1.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIS')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibindo o gráfico
@@ -268,7 +268,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title("A ventilação é adequada?")
 plt.text(0.02, 1.3, '* Uma das institíções é composta por unidades de moradia',
          color='red', ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir o gráfico
@@ -315,7 +315,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title("A pintura do quarto é adequada?")
 plt.text(0.02, 0.3, '* Uma das instituíções é composta por unidades de moradia',
          color='red', ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir o gráfico
@@ -369,7 +369,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Tipo de acessibilidade ao quarto do residente')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -421,7 +421,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Tipo de acessibilidade ao banheiro do residente')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -472,7 +472,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Tipo de acessibilidade ao refeitorio do residente')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -523,7 +523,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Tipo de acessibilidade ao outras areas do residente')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -592,7 +592,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Uso de Equipamento de Proteção Individual')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico

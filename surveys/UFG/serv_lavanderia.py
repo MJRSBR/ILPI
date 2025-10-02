@@ -70,7 +70,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Separação de roupas limpas e sujas')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -123,7 +123,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Frequência de troca de roupas de cama e toalhas')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico

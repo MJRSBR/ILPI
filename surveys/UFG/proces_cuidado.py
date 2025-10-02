@@ -67,7 +67,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Área para que o residente possa tomar um banho de sol')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -109,7 +109,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Área recebimento de visitas e familiares')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -152,7 +152,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Área de atividades sociais')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -194,7 +194,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Área de atividades sociais')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -236,7 +236,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Cardápio visível para consulta')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -249,7 +249,7 @@ freq_atualiz_cardapio = (df[["id_institution", "semanal_menu"]]
                    .assign(df_filtered=df["semanal_menu"].map({1: "Sim", 2: "Não"}))
                    [["id_institution", "df_filtered"]]
                    .rename(columns={"id_institution": "ILPI", "df_filtered": "atualiz_cardapio"})
-                   .fillna("Não é informado")
+                   .fillna("Dado não foi preenchido")
 )
 
 freq_atualiz_cardapio 
@@ -279,7 +279,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Frequência que o cardápio é atualizado')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -336,7 +336,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Realização de oficinas e atividades')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico

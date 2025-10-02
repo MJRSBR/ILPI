@@ -6,9 +6,6 @@ sys.path.append('/Users/mjrs/Library/CloudStorage/OneDrive-Pessoal/UFG/Projeto_V
 # Bibliotecas
 # --------------------
 import pandas as pd
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-# from matplotlib.ticker import MaxNLocator
 import os
 
 from funcoes.f_plot import plot_config, plot_barh, salvar_tabela_como_imagem
@@ -32,6 +29,10 @@ df
 df.rename(columns={'institution_name':'id_institution'}, inplace=True)
 df
 # %%
+df['id_institution'] = df['id_institution'].astype(str)
+df['id_institution'].dtypes
+df.dtypes
+# %%
 # ---------------------
 # NUMERO DE RESIDENTES
 # ---------------------
@@ -49,14 +50,23 @@ salvar_tabela_como_imagem(
     '../../UFG/tables/01_qtde_residentes.png'
 )
 # %%
-plot_barh(
+from funcoes.f_plot import plot_bar_flex_unificado
+
+# %%
+
+plot_bar_flex_unificado(
     qtde_residentes,
     'Distribuição Residentes por ILPI',
-    'ILPIs',
-    'Qtde Residentes',
+    '',
+    '',
     '../../UFG/plots/01_residentes_ILPI.png',
-    obs=5
+    col_categoria='ILPI',
+    col_grupo='ILPI',
+    orientation= 'v',
+    value_format='absolute'
+
 )
+
 # %%
 # ---------------------
 # DISPOSIÇÃO DAS CAMAS DOS RESIDENTES DE ACORDO COM A NORMA
@@ -149,7 +159,7 @@ camas_count= camas['Camas segundo a Norma?'].value_counts()
 plot_barh(
     camas_count,
     'Distribuição de Camas segundo a Norma',
-    'ILPIs',
+    'Número de ILPIs',
     'Camas de acordo com a norma',
     '../../UFG/plots/02_camas_norma.png',
     obs=2
@@ -177,13 +187,15 @@ salvar_tabela_como_imagem(
 # Gráfico 2 - Veículos à disposição da ILPI
 # Contando os valores (Sim e Não)
 veiculo_counts = veiculo['Existe veículo à disposição?'].value_counts()
+veiculo_counts
 
 plot_barh(
     veiculo_counts,
     'Existe veículo à disposição nas ILPIs',
-    'ILPIs',
+    'Número de ILPIs',
     'veiculos',
     '../../UFG/plots/03_veiculo.png',
     obs=2
 )
 # %%
+

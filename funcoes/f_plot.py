@@ -38,52 +38,84 @@ def plot_config():
 
 #--------------
 
-def salvar_tabela_como_imagem(df, caminho_arquivo, titulo=None, largura_max_coluna=30):
-    """ Salva a tabela gerada em .png.
-        Parâmetros:
-        - df: DataFrame do pandas.
-        - caminho_arquivo: define o caminho onde será gravada a imagem (Ex: '../tables/nome_arquivo.png')
-        - title: string com o título da tabela (opcional)
-        - largura_max_coluna=30: define a largura das colunas da tabela
-    """
-    import textwrap # serve para formatar textos, ajustando-os para caber em uma largura específica, com a possibilidade de quebrar linhas e aplicar recuo.
+def salvar_tabela_como_imagem(df, caminho_arquivo, titulo=None, largura_total_max=100):
     import matplotlib.pyplot as plt
+    import textwrap
+    import pandas as pd
 
-    # Copiar DataFrame e aplicar quebra de linha
-    df_wrapped = df.copy()
-    for col in df_wrapped.columns:
-        df_wrapped[col] = df_wrapped[col].astype(str).apply(
-            lambda x: "\n".join(textwrap.wrap(x, largura_max_coluna)) if len(x) > largura_max_coluna else x
+    # 1. Garantir que todos os dados são strings (substituindo applymap por apply+map)
+    df_str = df.copy().apply(lambda col: col.map(lambda x: '-' if pd.isna(x) else str(x)))
+
+    # 2. Calcular tamanho do conteúdo por coluna
+    max_lens = {
+        col: max(df_str[col].apply(len).max(), len(str(col)))
+        for col in df.columns
+    }
+
+    # 3. Identificar a coluna com maior conteúdo
+    coluna_principal = max(max_lens, key=max_lens.get)
+
+    # 4. Calcular proporções
+    total_chars = sum(max_lens.values())
+    proporcoes = {
+        col: max_lens[col] / total_chars for col in df.columns
+    }
+
+    # 5. Definir largura das colunas
+    largura_por_coluna = {}
+    for col in df.columns:
+        col_data = df_str[col]
+        valores_unicos = col_data.dropna().unique()
+
+        if col == coluna_principal:
+            largura_por_coluna[col] = int(largura_total_max * 0.40)
+
+        elif len(valores_unicos) == 1 and valores_unicos[0].strip().lower() in ['-', 'não se aplica']:
+            largura_por_coluna[col] = 10  # largura mínima
+
+        else:
+            largura_por_coluna[col] = max(10, int(proporcoes[col] * largura_total_max * 0.60))
+
+    # 6. Aplicar quebras de linha
+    df_wrapped = df_str.copy()
+    for col in df.columns:
+        largura = largura_por_coluna[col]
+        wrap_limit = max(10, largura // 2)
+        df_wrapped[col] = df_wrapped[col].apply(
+            lambda x: "\n".join(textwrap.wrap(x, width=wrap_limit)) if len(x) > largura else x
         )
 
-    # Calcular largura ideal por coluna com base no maior item (linha ou cabeçalho)
-    col_widths = [
-        max(
-            df_wrapped[col].apply(lambda x: len(max(str(x).split("\n"), key=len))).max(),
-            len(str(col))
-        ) * 0.12
-        for col in df_wrapped.columns
-    ]
-    total_width = sum(col_widths) + 1
+    # 7. Largura total da imagem
+    largura_em_polegadas = [largura_por_coluna[col] * 0.12 for col in df.columns]
+    total_width = sum(largura_em_polegadas) + 1
 
-    # Altura baseada no número de linhas
+    # 8. Altura dinâmica
+    def contar_linhas(texto):
+        return texto.count('\n') + 1
+
+    # Substituindo applymap por apply+map para evitar FutureWarning
+    linhas_por_linha = df_wrapped.apply(lambda col: col.map(contar_linhas)).mean(axis=1)
+    fator_altura = linhas_por_linha.mean()
+
     row_height = 0.6
-    fig_height = df.shape[0] * row_height + (1.5 if titulo else 1)
+    fig_height = df.shape[0] * row_height * fator_altura + (1.5 if titulo else 1)
 
+    # 9. Plotagem
     fig, ax = plt.subplots(figsize=(total_width, fig_height))
     ax.axis('off')
 
     tabela = ax.table(
         cellText=df_wrapped.values,
-        colLabels=df_wrapped.columns,
+        colLabels=df.columns,
         cellLoc='center',
         loc='center'
     )
 
     tabela.auto_set_font_size(False)
     tabela.set_fontsize(10)
-    tabela.scale(1, 1.5)
+    tabela.scale(1, 2 * fator_altura)
 
+    # 10. Estilo das células
     for (row, col), cell in tabela.get_celld().items():
         if row == 0:
             cell.set_text_props(weight='bold', color='white')
@@ -99,7 +131,70 @@ def salvar_tabela_como_imagem(df, caminho_arquivo, titulo=None, largura_max_colu
     plt.savefig(caminho_arquivo, dpi=300, bbox_inches='tight')
     plt.close()
 
-    print(f"✅ Tabela salva como imagem em {caminho_arquivo}")     
+    print(f"✅ Tabela salva como imagem em {caminho_arquivo}")
+
+# def salvar_tabela_como_imagem(df, caminho_arquivo, titulo=None, largura_max_coluna=30):
+#     """ Salva a tabela gerada em .png.
+#         Parâmetros:
+#         - df: DataFrame do pandas.
+#         - caminho_arquivo: define o caminho onde será gravada a imagem (Ex: '../tables/nome_arquivo.png')
+#         - title: string com o título da tabela (opcional)
+#         - largura_max_coluna=30: define a largura das colunas da tabela
+#     """
+#     import textwrap # serve para formatar textos, ajustando-os para caber em uma largura específica, com a possibilidade de quebrar linhas e aplicar recuo.
+#     import matplotlib.pyplot as plt
+
+#     # Copiar DataFrame e aplicar quebra de linha
+#     df_wrapped = df.copy()
+#     for col in df_wrapped.columns:
+#         df_wrapped[col] = df_wrapped[col].astype(str).apply(
+#             lambda x: "\n".join(textwrap.wrap(x, largura_max_coluna)) if len(x) > largura_max_coluna else x
+#         )
+
+#     # Calcular largura ideal por coluna com base no maior item (linha ou cabeçalho)
+#     col_widths = [
+#         max(
+#             df_wrapped[col].apply(lambda x: len(max(str(x).split("\n"), key=len))).max(),
+#             len(str(col))
+#         ) * 0.12
+#         for col in df_wrapped.columns
+#     ]
+#     total_width = sum(col_widths) + 1
+
+#     # Altura baseada no número de linhas
+#     row_height = 0.6
+#     fig_height = df.shape[0] * row_height + (1.5 if titulo else 1)
+
+#     fig, ax = plt.subplots(figsize=(total_width, fig_height))
+#     ax.axis('off')
+
+#     tabela = ax.table(
+#         cellText=df_wrapped.values,
+#         colLabels=df_wrapped.columns,
+#         cellLoc='center',
+#         loc='center'
+#     )
+
+#     tabela.auto_set_font_size(False)
+#     tabela.set_fontsize(10)
+#     tabela.scale(1, 1.5)
+
+#     for (row, col), cell in tabela.get_celld().items():
+#         if row == 0:
+#             cell.set_text_props(weight='bold', color='white')
+#             cell.set_facecolor('#40466e')
+#         else:
+#             cell.set_facecolor('#f1f1f2')
+#         cell.set_edgecolor('gray')
+
+#     if titulo:
+#         plt.title(titulo, fontsize=14, weight='bold', pad=20)
+
+#     plt.tight_layout()
+#     plt.savefig(caminho_arquivo, dpi=300, bbox_inches='tight')
+#     plt.close()
+
+#     print(f"✅ Tabela salva como imagem em {caminho_arquivo}")     
 
 # ----------------------------------------
 

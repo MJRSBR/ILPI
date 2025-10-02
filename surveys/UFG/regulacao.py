@@ -54,7 +54,7 @@ salvar_tabela_como_imagem(
 plt.figure(figsize=(10, 6))
 
 # Agrupar e plotar o gráfico de barras horizontais
-ubs.groupby('ubs_list').size().plot(
+ubs.groupby('ubs').size().plot(
     kind='barh',
     color=['#4E79A7', '#F28E2B']
 )
@@ -69,7 +69,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('UBS que o residente é encaminhado quando necessário')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico
@@ -114,12 +114,14 @@ salvar_tabela_como_imagem(
     '../../UFG/tables/43_upa.png'
 )
 # %%
+
+
 # Gráfico 41 - UPA que o residente é encaminhado quando necessário
 # --------------------
 plt.figure(figsize=(10, 6))
 
 # Agrupar e plotar o gráfico de barras horizontais
-upa.groupby('upa_list').size().plot(
+upa.groupby(['upa', 'upa_1', 'upa_2']).size().plot(
     kind='barh',
     color=['#4E79A7', '#F28E2B']
 )
@@ -377,7 +379,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('ILPI é campo de estágio')
 plt.text(0.02, 0.3,'* Uma das instituíções é composta por unidades de moradia',
         color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIs')
+plt.xlabel('Numero de ILPIs')
 plt.ylabel('')
 
 # Exibir gráfico

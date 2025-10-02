@@ -120,6 +120,7 @@ salvar_tabela_como_imagem(
     vinculo_empreg,
     '../../UFG/tables/05_vinculo_empreg.png'
 )
+
 # %%
 # ---------------------
 # Gráfico 05 - Vínculo Empregatício
@@ -142,7 +143,7 @@ plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.title('Vínculo Empregatício dos Profissionais das ILPIs')
 plt.text(1.4, 2.3,'* Uma das instituíções é composta por unidades de moradia',
          color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('ILPIS')
+plt.xlabel('Número de ILPIs')
 plt.ylabel('Tipo de Vínculo')
 
 # Exibir gráfico
@@ -180,70 +181,70 @@ salvar_tabela_como_imagem(
     '../../UFG/tables/06_plano_reabilit.png'
 )
 # %%
-def plot_barh(data, title, xlabel, ylabel, filename, obs=2, show_text=True, show_values=True):
-    """
-    Gera um gráfico de barras horizontal com valores percentuais centralizados nas barras
-    e o eixo X em valores absolutos.
+# def plot_barh(data, title, xlabel, ylabel, filename, obs=2, show_text=True, show_values=True):
+#     """
+#     Gera um gráfico de barras horizontal com valores percentuais centralizados nas barras
+#     e o eixo X em valores absolutos.
 
-    Parâmetros:
-    - data: DataFrame OU Series (pandas).
-    - title: string com o título do gráfico.
-    - xlabel: string com o rótulo do eixo X.
-    - ylabel: string com o rótulo do eixo Y.
-    - filename: string com o caminho e nome do arquivo (ex: 'plots/exemplo.png')
-    - obs: número de observações (define quantas cores usar).
-    - show_text: se True, exibe observação adicional no gráfico.
-    - show_values: se True, exibe os percentuais nas barras.
-    """
-    import pandas as pd
-    import matplotlib.pyplot as plt
-    from matplotlib.ticker import MaxNLocator
+#     Parâmetros:
+#     - data: DataFrame OU Series (pandas).
+#     - title: string com o título do gráfico.
+#     - xlabel: string com o rótulo do eixo X.
+#     - ylabel: string com o rótulo do eixo Y.
+#     - filename: string com o caminho e nome do arquivo (ex: 'plots/exemplo.png')
+#     - obs: número de observações (define quantas cores usar).
+#     - show_text: se True, exibe observação adicional no gráfico.
+#     - show_values: se True, exibe os percentuais nas barras.
+#     """
+#     import pandas as pd
+#     import matplotlib.pyplot as plt
+#     from matplotlib.ticker import MaxNLocator
 
-# 🛠️ Se for Series, converte para DataFrame de 1 linha com as categorias como colunas
-    if isinstance(data, pd.Series):
-        data = data.to_frame().T
-        data.index = ['']  # Remove o índice numérico (evita aparecer "0" ou "count" no eixo Y)
+# # 🛠️ Se for Series, converte para DataFrame de 1 linha com as categorias como colunas
+#     if isinstance(data, pd.Series):
+#         data = data.to_frame().T
+#         data.index = ['']  # Remove o índice numérico (evita aparecer "0" ou "count" no eixo Y)
 
-    # Paleta de cores personalizada
-    all_colors = ["#4E5EA7", '#F28E2B', "#AF3739", '#76B7B2', '#59A14F', '#EDC948']
-    color = all_colors[:obs] if isinstance(all_colors, list) else all_colors
+#     # Paleta de cores personalizada
+#     all_colors = ["#4E5EA7", '#F28E2B', "#AF3739", '#76B7B2', '#59A14F', '#EDC948']
+#     color = all_colors[:obs] if isinstance(all_colors, list) else all_colors
 
-    # Cálculo dos percentuais por linha
-    percent_df = data.div(data.sum(axis=1), axis=0) * 100
+#     # Cálculo dos percentuais por linha
+#     percent_df = data.div(data.sum(axis=1), axis=0) * 100
 
-    # Plot
-    ax = data.plot(kind='barh', color=color, figsize=(10, 6))
-    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-    plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
+#     # Plot
+#     ax = data.plot(kind='barh', color=color, figsize=(10, 6))
+#     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+#     plt.title(title)
+#     plt.xlabel(xlabel)
+#     plt.ylabel(ylabel)
 
-    # Inserção dos percentuais nas barras
-    if show_values:
-        for col_idx, container in enumerate(ax.containers):
-            col_name = data.columns[col_idx]
-            for bar, (idx, percent) in zip(container, percent_df[col_name].items()):
-                width = bar.get_width()
-                if pd.notna(percent) and width > 0:
-                    x = width / 2
-                    y = bar.get_y() + bar.get_height() / 2
-                    font_size = max(8, min(12, width * 0.25))
-                    ax.text(x, y,
-                            f'{percent:.1f}%',
-                            ha='center',
-                            va='center',
-                            color='white',
-                            fontweight='bold',
-                            fontsize=font_size)
+#     # Inserção dos percentuais nas barras
+#     if show_values:
+#         for col_idx, container in enumerate(ax.containers):
+#             col_name = data.columns[col_idx]
+#             for bar, (idx, percent) in zip(container, percent_df[col_name].items()):
+#                 width = bar.get_width()
+#                 if pd.notna(percent) and width > 0:
+#                     x = width / 2
+#                     y = bar.get_y() + bar.get_height() / 2
+#                     font_size = max(8, min(12, width * 0.25))
+#                     ax.text(x, y,
+#                             f'{percent:.1f}%',
+#                             ha='center',
+#                             va='center',
+#                             color='white',
+#                             fontweight='bold',
+#                             fontsize=font_size)
 
-    # Observação adicional opcional
-    if show_text:
-        plt.text(0.075, 0.25, '* Uma das instituições é composta por unidades de moradia',
-                 color='red', ha='left', va='bottom', transform=plt.gcf().transFigure, wrap=True)
+#     # Observação adicional opcional
+#     if show_text:
+#         plt.text(0.075, 0.25, '* Uma das instituições é composta por unidades de moradia',
+#                  color='red', ha='left', va='bottom', transform=plt.gcf().transFigure, wrap=True)
 
-    plt.tight_layout()
-    plt.savefig(filename, dpi=300)
-    plt.show()
+#     plt.tight_layout()
+#     plt.savefig(filename, dpi=300)
+#     plt.show()
 # %%    
 # ----------------------
 # Gráfico 5 - Plano Reabilitação
@@ -253,7 +254,7 @@ plano_counts = plano_reab['plano_reabilitacao'].value_counts()
 plot_barh(
     plano_counts,
     'Plano/programa semanal de atividade física e reabilitação funcional',
-    'ILPIs',
+    'Número de ILPIs',
     'planos',
     '../../UFG/plots/06_plano_terapeutico.png',
     obs=5
@@ -286,7 +287,7 @@ instr_counts = instr_fisio['Instrucao_fisioterapeuta'].value_counts()
 plot_barh(
     instr_counts,
     'Instruções do fisioterapeuta ao cuidador está documentada?',
-    'ILPIs',
+    'Número de ILPIs',
     'instr',
     '../../UFG/plots/07_instrucao_fisioterapeuta.png'
 )
