@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.ticker import MaxNLocator
 
+from funcoes.f_process import processa_binario, processa_multiresposta
 from funcoes.f_plot import plot_config, plot_barh, salvar_tabela_como_imagem
 # %%
 # ------------------------------
@@ -36,13 +37,12 @@ df
 # SEGURANÇA E MEIO AMBIENTE
 # Serviço/sistema de segurança para sua proteção e dos idosos
 
-sist_seg = (df[['id_institution', 'secutiry_system']]
-                        .assign(df_filtered=df['secutiry_system'].map({1: 'Sim', 2: 'Não'}))  # Mapeando 'residents_bedroom'
-                        [['id_institution', 'df_filtered']]  # Selecionando as colunas necessárias
-                        .rename(columns={'id_institution': 'ILPI', 'df_filtered': 'Sistemas_segurança'})  # Renomeando as colunas
+sist_seg = processa_binario(df, 
+                            'secutiry_system', 
+                            'Sistemas_segurança', 
+                            {1: 'Sim', 2: 'Não'}
 )
 
-# Exibindo o resultado
 sist_seg
 # %%
 # Salvando a tabela em /tables
@@ -69,21 +69,14 @@ plot_barh(
 # Ajustar a exibição do pandas para mostrar mais caracteres
 pd.set_option('display.max_colwidth', None)  # Permite exibir a coluna inteira
 
-tipos_sist_seg = (
-    df[["id_institution", "security_device_type___1", "security_device_type___2", "security_device_type___3", "security_device_type___4", "security_device_type___5"]]
-    .assign(
-        tipos_sist_seguranca= (
-            df["security_device_type___1"].map(lambda x: 'Alarme (incêndio/violação)' if x == 1 else ' ') +
-            df["security_device_type___2"].map(lambda x: ', Cameras interno' if x == 1 else '') +
-            df["security_device_type___3"].map(lambda x: ', Cameras externo' if x == 1 else '') +
-            df["security_device_type___4"].map(lambda x: ', Segurança (individuo)' if x == 1 else '') +
-            df["security_device_type___5"].map(lambda x: ', Segurança armada (indivíduo)' if x == 1 else '') 
-        )
-    )
-    .assign(tipos_sist_seguranca=lambda x: x['tipos_sist_seguranca'].str.lstrip(', '))  # Limpar vírgula no início da string
-    .rename(columns={"id_institution": "ILPI"})  # Renomeando a coluna
-    [["ILPI", "tipos_sist_seguranca"]]  # Selecionando apenas as colunas finais
-)
+tipos_sist_cols = {
+    'security_device_type___1': 'Alarme (incêndio/violação)',
+    'security_device_type___2': 'Câmeras internas',
+    'security_device_type___3': 'Câmeras externas',
+    'security_device_type___4': 'Segurança (indivíduo)',
+    'security_device_type___5': 'Segurança armada (indivíduo)'
+}
+tipos_sist_seg = processa_multiresposta(df, tipos_sist_cols, 'Tipos_Sist_Seguranca')
 
 tipos_sist_seg
 # %%
@@ -94,42 +87,16 @@ salvar_tabela_como_imagem(
 )
 # %%
 # ---------------------
-# Gráfico 10 - Tipos de Sistema de Segurança
+# Gráfico 09 - Tipos de Sistema de Segurança
 
-# Tamanho da figura
-plt.figure(figsize=(10, 6))
-
-# Agrupar e plotar o gráfico de barras horizontais
-tipos_sist_seg.groupby('tipos_sist_seguranca').size().plot(
-    kind='barh',
-    color=sns.palettes.mpl_palette('Dark2')
+tipos_counts = tipos_sist_seg['Tipos_Sist_Seguranca'].value_counts()
+plot_barh(tipos_counts, 
+          'Tipo de Sistema de Segurança', 
+          'Número de ILPIs', 
+          'Percentual Tipo de Sistema Segurança', 
+          '../../UFG/plots/09_tipos_sist_seg.png'
 )
 
-# Ajustar bordas
-plt.gca().spines[['top', 'right']].set_visible(False)
-
-# Garantir que o eixo X seja inteiro
-plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
-
-# Título e rótulos
-plt.title('Contagem por Tipo de Sistema de Segurança')
-plt.text(-2.5, 2.3,'* Uma das instituíções é composta por unidades de moradia',
-        color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('Número de ILPIS')
-plt.ylabel('Tipo de Sistema de Segurança')
-
-# Exibir gráfico
-plt.savefig("../../UFG/plots/09_tipos_sist_seg.png")
-plt.show()
-
-#tipos_sist_seg_counts = tipos_sist_seg['tipos_sist_seguranca'].value_counts()
-
-#plot_barh(
-#    tipos_sist_seg,
-#    'Tipos de Sistemas de Segurança',
-#    'ILPIs',
-#    'tipos_sist_seg.png'
-#)
 # %%
 # ----------------------------
 # Dispositivo/mecanismo (digital/analógico) de chamada que o 
@@ -144,47 +111,35 @@ disp_chamada = (df[["id_institution", "safety_device_availability"]]
 
 disp_chamada
 # %%
+disp_chamada = processa_binario(df, 
+                                'safety_device_availability', 
+                                'Disponibilidade_disp_chamada', 
+                                {1: 'Sim', 2: 'Não'}
+)
+disp_chamada
+# %%
 # Salvando a tabela em /tables
 salvar_tabela_como_imagem(
     disp_chamada,
     '../../UFG/tables/10_disp_chamada.png'
 )
 # %%
-# Gráfico 9 Dispositivo/mecanismo (digital/analógico) de chamada
-#disp_counts = disp_chamada["Disponibilidade_dispositivo_chamada"].value_counts()
-#
-#plot_barh(
-#    disp_chamada,
-#    'Dispositivo/mecanismo (digital/analógico) de chamada pelo residente',
-#    'ILPIs',
-#    '09_disp_chamada.png'
-#)
-# %%
-# Contando os valores
-counts = disp_chamada["Disponibilidade_dispositivo_chamada"].value_counts()
-
-# Criando o gráfico de barras horizontais
-counts.plot(kind='barh', color=['#4E79A7', '#F28E2B'])
-
-# Garantir que o eixo X seja inteiro
-plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
-
-# Adicionando título e rótulos
-plt.title('Disponibilidade de dispositivo de chamada pelo residente')
-plt.xlabel('Número de ILPIs')
-plt.ylabel('')
-
-# Exibindo o gráfico
-plt.savefig('../../UFG/plots/10_disp_chamada.png')
-plt.show()
+# Gráfico 10 Dispositivo/mecanismo (digital/analógico) de chamada
+disp_chamada_counts = disp_chamada['Disponibilidade_disp_chamada'].value_counts()
+plot_barh(disp_chamada_counts, 
+          'Dispositivo/mecanismo (digital/analógico) de chamada', 
+          'Número de ILPIs',
+           '',
+           '../../UFG/plots/10_disp_chamada.png'
+)  
 # -------------------
 # %%
 # Iluminação adequada
-
-iluminacao = (df[["id_institution", "lighting"]]
-              .assign(df_filtered=df["lighting"].map({1 : "Sim", 2 : "Não"})) # Mapeando lighting
-              [["id_institution", "df_filtered"]] # Selecionando colunas
-              .rename(columns={"id_institution": "ILPI", "df_filtered": "Iluminacao_adequada"})
+## - Iluminação
+iluminacao = processa_binario(df, 
+                              'lighting', 
+                              'Iluminacao_adequada', 
+                              {1: 'Sim', 2: 'Não'}
 )
 
 iluminacao
@@ -198,45 +153,22 @@ salvar_tabela_como_imagem(
 # -------------------
 # Gráfico 12 - iluminação adequada
 
-#iluminacao_counts = iluminacao['Iluminacao_adequada'].value_counts()
+iluminacao_counts = iluminacao['Iluminacao_adequada'].value_counts()
 
-#plot_barh(
-#   iluminacao,
-#   'A iluminição é adequada?',
-#   'ILPIs',
-#   '10_ilumincacao.png'
-#
+plot_barh(iluminacao_counts, 
+          'A iluminação é adequada?', 
+          'Número de ILPIs', '',
+          '../../UFG/plots/11_iluminacao.png')
 
-# %%
-# Contando os valores
-counts = iluminacao["Iluminacao_adequada"].value_counts()
-
-# Criando o gráfico de barras horizontais
-counts.plot(kind='barh', color=['#4E79A7', '#F28E2B'])
-
-# Garantir que o eixo X seja inteiro
-plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
-
-# Adicionando título e rótulos
-plt.title('A iluminação é adequada?')
-plt.text(0.02, 1.3,'* Uma das instituíções é composta por unidades de moradia',
-        color='red',ha='left', va='bottom', wrap=True)
-plt.xlabel('Número de ILPIs')
-plt.ylabel('')
-
-# Exibindo o gráfico
-plt.savefig('../../UFG/plots/11_ilumincacao.png')
-plt.show()
 # %%
 # --------------------
 
 # Ventilação adequada
 
-ventilacao = (df[["id_institution", "ventilation"]]
-             .assign(df_filtered=df["ventilation"].map({1:"Sim", 2:"Não"}))
-             [["id_institution", "df_filtered"]]
-             .rename(columns={"id_institution": "ILPI", "df_filtered": "Ventilacao_adequada"})
-
+ventilacao = processa_binario(df, 
+                              'ventilation', 
+                              'ventilacao_adequada', 
+                              {1: 'Sim', 2: 'Não'}
 )
 
 ventilacao
@@ -249,40 +181,22 @@ salvar_tabela_como_imagem(
 # %%
 # ------------------
 # Gráfico 12 - Ventilação Adequada
-# Tamanho da figura
-plt.figure(figsize=(10,6))
 
-# Agrupar e plotar o g'rafico de barras horizontais
-ventilacao.groupby("Ventilacao_adequada").size().plot(
-    kind="barh",
-    color=['#4E79A7', '#F28E2B']
+
+ventilacao_counts = ventilacao['ventilacao_adequada'].value_counts()
+plot_barh(ventilacao_counts, 
+          'A ventilação é adequada?', 
+          'Número de ILPIs', '',
+          '../plots/11_ventilacao.png'
 )
-
-# Ajustar as bordas
-plt.gca().spines[['top', 'right']].set_visible(False)
-
-# Garantir que o eixo x seja inteiro
-plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
-
-# Títulos e rótulos
-plt.title("A ventilação é adequada?")
-plt.text(0.02, 1.3, '* Uma das institíções é composta por unidades de moradia',
-         color='red', ha='left', va='bottom', wrap=True)
-plt.xlabel('Número de ILPIs')
-plt.ylabel('')
-
-# Exibir o gráfico
-plt.savefig("../../UFG/plots/12_ventilacao.png")
-plt.show()
-
 # %%
 # -----------------------
 # Pintura do quarto tons pastéis
 
-pintura_quartos = (df[["id_institution", "painting_color"]]
-                   .assign(df_filtered=df["painting_color"].map({1: "Sim", 2: "Não"}))
-                   [["id_institution", "df_filtered"]]
-                   .rename(columns={"id_institution": "ILPI", "df_filtered": "Pintura_tons_pasteis"})
+pintura_quartos=processa_binario(df, 
+                                 'painting_color', 
+                                 'Pintura_tons_pastel', 
+                                 {1: 'Sim', 2: 'Não'}
 )
 
 pintura_quartos
@@ -296,31 +210,13 @@ salvar_tabela_como_imagem(
 # ---------------------
 # Gráfico 13 - Pintura quartos tons pastéis
 #  -------------------
-# Tamanho da figura
-plt.figure(figsize=(10,6))
+pintura_quartos_counts = pintura_quartos['Pintura_tons_pastel'].value_counts()
 
-# Agrupar e plotar o g'rafico de barras horizontais
-pintura_quartos.groupby("Pintura_tons_pasteis").size().plot(
-    kind="barh",
-    color=['#4E79A7', '#F28E2B']
+plot_barh(pintura_quartos_counts, 
+          "Quartos pintados em tons pastel", 
+          "ILPI", '',
+          '../../UFG/plots/13_pintura_quarto.png'
 )
-
-# Ajustar as bordas
-plt.gca().spines[['top', 'right']].set_visible(False)
-
-# Garantir que o eixo x seja inteiro
-plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
-
-# Títulos e rótulos
-plt.title("A pintura do quarto é adequada?")
-plt.text(0.02, 0.3, '* Uma das instituíções é composta por unidades de moradia',
-         color='red', ha='left', va='bottom', wrap=True)
-plt.xlabel('Número de ILPIs')
-plt.ylabel('')
-
-# Exibir o gráfico
-plt.savefig("../../UFG/plots/13_pintura_quarto.png")
-plt.show()
 
 # %%
 # -------------------
@@ -349,7 +245,7 @@ salvar_tabela_como_imagem(
 )
 # %%
 # -------------------
-# Gráfico 13 - Acessíbilidade do quarto
+# Gráfico 14 - Acessíbilidade do quarto
 # Tamanho da figura
 plt.figure(figsize=(10, 6))
 
@@ -391,8 +287,6 @@ acessib_banheiro = (df[["id_institution", "bathroom_access___1", "bathroom_acces
                   .rename(columns={"id_institution": "ILPI"})  # Renomeando a coluna
                   [["ILPI", "acessib_banheiro_list"]]  # Selecionando apenas as colunas finais
 )
-
-acessib_banheiro
 # %%
 # Salvando a tabela em /tables
 salvar_tabela_como_imagem(
@@ -545,6 +439,7 @@ salvar_tabela_como_imagem(
     quadro_geral_acessib,
     '../../UFG/tables/18_quadro_geral_acess.png'
 )
+# %%
 # -----------------------
 # Os profissionais da ILPI utilizam qualquer tipo de EPI's, durante no cuidado com os idosos
 
@@ -553,6 +448,8 @@ uso_epi = (df[["id_institution", "epi_use"]]
            [["id_institution", "df_filtered"]]
            .rename(columns={"id_institution": "ILPI", "df_filtered": "Uso_equip_prot_individual"})
 )
+# %%
+uso_epi =processa_binario(df, 'epi_use', "Uso_equip_seguranca", {1: 'Sim', 2:'Não'})
 
 uso_epi
 # %%
@@ -598,4 +495,9 @@ plt.ylabel('')
 # Exibir gráfico
 plt.savefig("../../UFG/plots/19_uso_epi.png")
 plt.show()
+# %%
+ # CORRIGIR NAN
+uso_epi_counts = uso_epi['Uso_equip_seguranca'].value_counts()
+plot_barh(uso_epi_counts, 'Uso de Equipamentos de Segurança', 'Número de ILPIs','',
+          '../../UFG/plots/19_uso_epi.png')
 # %%

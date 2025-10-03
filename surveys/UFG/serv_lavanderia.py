@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
 from utils.utils import criar_diretorios
+from funcoes.f_process import processa_binario, processa_uma_variavel_com_opcoes
 from funcoes.f_plot import plot_config, salvar_tabela_como_imagem
 # %%
 # ------------------------------
@@ -35,10 +36,10 @@ df
 # Serviço Lavanderia
 # Separação de roupas limpas e sujas
 
-roupa_segreg = (df[["id_institution", "dirty_clothing_segregation"]]
-                .assign(df_filtered=df["dirty_clothing_segregation"].map({1: "Sim", 2: "Não"}))
-                [["id_institution", "df_filtered"]]
-                .rename(columns={"id_institution": "ILPI", "df_filtered": "Separacao_roupas_sujas_limpas"})
+roupa_segreg = processa_binario(df, 
+                                'dirty_clothing_segregation', 
+                                'Separacao_roupas_sujas_limpas', 
+                                {1: 'Sim', 2: 'Não'}
 )
 
 roupa_segreg
@@ -91,6 +92,23 @@ freq_troca_roupa_cama = (df[["id_institution", "dirty_clothing_change"]]
                   .assign(freq_troca_roupa_cama_list=lambda x: x['freq_troca_roupa_cama_list'].str.lstrip(', '))  # Limpar vírgula no início da string
                   .rename(columns={"id_institution": "ILPI"})  # Renomeando a coluna
                   [["ILPI", "freq_troca_roupa_cama_list"]]  # Selecionando apenas as colunas finais
+)
+# %%
+
+# %%
+
+mapa = {
+    1: 'diário',
+    2: 'semanal',
+    3: 'quinzenal',
+    4: 'mensal'
+}
+
+freq_troca_roupa_cama = processa_uma_variavel_com_opcoes(
+    df,
+    "dirty_clothing_change",
+    "freq_troca_roupa_cama_list",
+    mapa
 )
 
 freq_troca_roupa_cama

@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.ticker import MaxNLocator
 
+from funcoes.f_process import processa_binario, processa_multiresposta
 from funcoes.f_plot import plot_config, plot_barh, salvar_tabela_como_imagem
 # %%
 # ------------------------------
@@ -59,7 +60,7 @@ df_profissionais = pd.concat(
         df[df[col] >= 1][['id_institution', days_col]]
         .assign(profissional=prof)
         .rename(columns={days_col: 'Dias_por_mes', 'id_institution': 'ILPI'})
-        .assign(Dias_por_mes=lambda x: x['Dias_por_mes'].round(1))  # Corrigido aqui
+        .assign(Dias_por_mes=lambda x: x['Dias_por_mes'].round(1))  
         [['ILPI', 'profissional', 'Dias_por_mes']]
         for prof, col, days_col in profissionais_mapping
     ]
@@ -96,24 +97,15 @@ plt.show()
 # %%
 #-------------------------------------------------------------
 # VINCULO
-# Criando e mapeando as colunas diretamente, com renomeação incluída para vinculo empregaticio
 
-vinculo_empreg = (
-    df[['id_institution', 'employment_relatioship___1', 'employment_relatioship___2', 'employment_relatioship___3']]
-    .assign(
-        Vinculo_empregaticio= (
-            df['employment_relatioship___1'].map(lambda x: 'CLT' if x == 1 else '') +
-            df['employment_relatioship___2'].map(lambda x: ', Contrato' if x == 1 else '') +
-            df['employment_relatioship___3'].map(lambda x: ', Voluntário' if x == 1 else '')
-        )
-    )
-    .assign(Vinculo_empregaticio=lambda x: x['Vinculo_empregaticio'].str.lstrip(', '))  # Limpa a vírgula extra no começo
-    .rename(columns={'id_institution': 'ILPI'})  # Renomeando a coluna id_institution para ILPI
-    [['ILPI', 'Vinculo_empregaticio']]  # Selecionando apenas as colunas desejadas
-)
-
-# Visualizando o DataFrame resultante
+vinculo_cols = {
+    'employment_relatioship___1': 'CLT',
+    'employment_relatioship___2': 'Contrato',
+    'employment_relatioship___3': 'Voluntário'
+}
+vinculo_empreg = processa_multiresposta(df, vinculo_cols, 'Vinculo_empregaticio')
 vinculo_empreg
+
 # %%
 # Salvando tabela em /tables
 salvar_tabela_como_imagem(
@@ -150,29 +142,14 @@ plt.ylabel('Tipo de Vínculo')
 plt.savefig("../../UFG/plots/05_vinculo_empreg.png")
 plt.show()
 # %%
-# -------------
-# Criando e mapeando as colunas diretamente, com renomeação incluída para 
-# Plano/programa semanal de atividade física e reabilitação funcional
-
-# Ajustar a exibição do pandas para mostrar mais caracteres
-pd.set_option('display.max_colwidth', None)  # Permite exibir a coluna inteira
-
-plano_reab = (
-    df[["id_institution", "physio_program___1", "physio_program___2", "physio_program___3", "physio_program___4"]]
-    .assign(
-        plano_reabilitacao= (
-            df["physio_program___1"].map(lambda x: 'melhoria do tônus muscular' if x == 1 else '') +
-            df["physio_program___2"].map(lambda x: ', equilíbrio funcionalidade motora' if x == 1 else '') +
-            df["physio_program___3"].map(lambda x: ', bem-estar geral com indicação do destinatário' if x == 1 else '') +
-            df["physio_program___4"].map(lambda x: ', não existe plano' if x == 1 else '')
-        )
-    )
-    .assign(plano_reabilitacao=lambda x: x['plano_reabilitacao'].str.lstrip(', '))  # Limpar vírgula no início da string
-    .rename(columns={"id_institution": "ILPI"})  # Renomeando a coluna
-    [["ILPI", "plano_reabilitacao"]]  # Selecionando apenas as colunas finais
-)
-
-# Visualizando o resultado
+## --- Plano de Reabilitação
+plano_cols = {
+    'physio_program___1': 'Melhoria do tônus muscular',
+    'physio_program___2': 'Equilíbrio funcionalidade motora',
+    'physio_program___3': 'Bem-estar geral com indicação do destinatário',
+    'physio_program___4': 'Não existe plano'
+}
+plano_reab = processa_multiresposta(df, plano_cols, 'Plano_Reabilitacao')
 plano_reab
 # %%
 # Salvando tabela em /tables
@@ -181,75 +158,10 @@ salvar_tabela_como_imagem(
     '../../UFG/tables/06_plano_reabilit.png'
 )
 # %%
-# def plot_barh(data, title, xlabel, ylabel, filename, obs=2, show_text=True, show_values=True):
-#     """
-#     Gera um gráfico de barras horizontal com valores percentuais centralizados nas barras
-#     e o eixo X em valores absolutos.
-
-#     Parâmetros:
-#     - data: DataFrame OU Series (pandas).
-#     - title: string com o título do gráfico.
-#     - xlabel: string com o rótulo do eixo X.
-#     - ylabel: string com o rótulo do eixo Y.
-#     - filename: string com o caminho e nome do arquivo (ex: 'plots/exemplo.png')
-#     - obs: número de observações (define quantas cores usar).
-#     - show_text: se True, exibe observação adicional no gráfico.
-#     - show_values: se True, exibe os percentuais nas barras.
-#     """
-#     import pandas as pd
-#     import matplotlib.pyplot as plt
-#     from matplotlib.ticker import MaxNLocator
-
-# # 🛠️ Se for Series, converte para DataFrame de 1 linha com as categorias como colunas
-#     if isinstance(data, pd.Series):
-#         data = data.to_frame().T
-#         data.index = ['']  # Remove o índice numérico (evita aparecer "0" ou "count" no eixo Y)
-
-#     # Paleta de cores personalizada
-#     all_colors = ["#4E5EA7", '#F28E2B', "#AF3739", '#76B7B2', '#59A14F', '#EDC948']
-#     color = all_colors[:obs] if isinstance(all_colors, list) else all_colors
-
-#     # Cálculo dos percentuais por linha
-#     percent_df = data.div(data.sum(axis=1), axis=0) * 100
-
-#     # Plot
-#     ax = data.plot(kind='barh', color=color, figsize=(10, 6))
-#     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-#     plt.title(title)
-#     plt.xlabel(xlabel)
-#     plt.ylabel(ylabel)
-
-#     # Inserção dos percentuais nas barras
-#     if show_values:
-#         for col_idx, container in enumerate(ax.containers):
-#             col_name = data.columns[col_idx]
-#             for bar, (idx, percent) in zip(container, percent_df[col_name].items()):
-#                 width = bar.get_width()
-#                 if pd.notna(percent) and width > 0:
-#                     x = width / 2
-#                     y = bar.get_y() + bar.get_height() / 2
-#                     font_size = max(8, min(12, width * 0.25))
-#                     ax.text(x, y,
-#                             f'{percent:.1f}%',
-#                             ha='center',
-#                             va='center',
-#                             color='white',
-#                             fontweight='bold',
-#                             fontsize=font_size)
-
-#     # Observação adicional opcional
-#     if show_text:
-#         plt.text(0.075, 0.25, '* Uma das instituições é composta por unidades de moradia',
-#                  color='red', ha='left', va='bottom', transform=plt.gcf().transFigure, wrap=True)
-
-#     plt.tight_layout()
-#     plt.savefig(filename, dpi=300)
-#     plt.show()
-# %%    
 # ----------------------
-# Gráfico 5 - Plano Reabilitação
+# Gráfico 6 - Plano Reabilitação
 
-plano_counts = plano_reab['plano_reabilitacao'].value_counts()
+plano_counts = plano_reab['Plano_Reabilitacao'].value_counts()
 
 plot_barh(
     plano_counts,
@@ -265,10 +177,11 @@ plot_barh(
 # Criando e mapeando as colunas diretamente, com renomeação incluída para 
 # Instruções do fisioterapeuta ao cuidador está documentada
 
-instr_fisio = (df[['id_institution', 'physio_instructions']]
-                        .assign(df_filtered=df['physio_instructions'].map({1: 'Sim', 2: 'Não'}))  # Mapeando 'residents_bedroom'
-                        [['id_institution', 'df_filtered']]  # Selecionando as colunas necessárias
-                        .rename(columns={'id_institution': 'ILPI', 'df_filtered': 'Instrucao_fisioterapeuta'})  # Renomeando as colunas
+instr_fisio = processa_binario(
+    df, 
+    'physio_instructions', 
+    'Instrucao_fisioterapeuta', 
+    {1: 'Sim', 2: 'Não'}
 )
 
 # Exibindo o resultado

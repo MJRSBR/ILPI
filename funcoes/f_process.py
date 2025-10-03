@@ -3,12 +3,62 @@ import numpy as np
 import os
 import re
 
-
-
-
 # ------------------------------
 # Funções processamento
 # ------------------------------
+
+def processa_binario(df, coluna, legenda, rename_dict):
+    """
+    Processa variáveis binárias para análise.
+
+    Parâmetros:
+    - df: Data Frame
+    - coluna: coluna da variável
+    - legenda: str, nome da nova coluna de saída
+    - rename_dict: dict, ex: {1: 'Sim', 0: 'Não'}
+    
+    Exemplo de uso:
+    tabela_camas = processa_binario(
+        df,
+        'residents_bedroom',
+        'Camas segundo a Norma',
+        rename_dict)
+    """
+    temp = (df[['id_institution', coluna]]
+                # Cria uma coluna cujo nome é o valor da variável legenda 
+                # populacionando com o mapeamento
+                .assign(**{legenda: df[coluna].map(rename_dict)}) 
+                .rename(columns={'id_institution': 'ILPI'})
+                .drop(columns=coluna)
+                )
+    return temp
+
+# ----------------------------------------
+
+def processa_uma_variavel_com_opcoes(df, coluna_original, nome_saida, mapa_valores):
+    """
+    Processa códigos inteiros para uma string descritiva (concatenada) com base em um dicionário de mapeamento.
+
+    Parâmetros:
+    - df: DataFrame original.
+    - coluna_original: str, nome da coluna com códigos.
+    - nome_saida: str, nome da nova coluna de saída.
+    - mapa_valores: dict, mapeamento de código -> texto.
+
+    Retorna:
+    - DataFrame com 'ILPI' e a nova coluna.
+    """
+    temp = df[["id_institution", coluna_original]].copy()
+    
+    # Concatena textos com base nos valores
+    def construir_texto(valor):
+        partes = [txt for cod, txt in mapa_valores.items() if valor == cod]
+        return ', '.join(partes) if partes else 'Não informado'
+    
+    temp[nome_saida] = temp[coluna_original].map(construir_texto)
+    temp = temp.rename(columns={"id_institution": "ILPI"})[["ILPI", nome_saida]]
+    
+    return temp
 
 # ----------------------------------------
 def processa_multiresposta(df, colunas_dict, legenda):
@@ -52,111 +102,35 @@ def processa_multiresposta(df, colunas_dict, legenda):
 
 # ----------------------------------------
 
-# def extrair_morbidades(df, morbidade_dict, nome_coluna_soma=None):
-#     """
-#     Filtra e retorna os dados de morbidades legíveis, agrupados por id_institution, full_name, uuidv5.
-#     A coluna 'other_morbidities' é normalizada (minúsculas, sem espaços),
-#     separando múltiplas entradas por vírgula, ponto e vírgula ou barra vertical.
-#     Soma final inclui morbidades binárias + textuais distintas.
+def criar_df_com_soma_por_prefixo(df, prefixo, nome_coluna_soma=None):
+    """
+    Retorna um novo DataFrame com as colunas que começam com o prefixo e uma coluna de soma.
 
-#     Parâmetros:
-#     - df: DataFrame.
-#     - morbidade_dict: dict, mapeamento de código -> texto.
-#     - nome_coluna_soma: str, nome da coluna soma (Se None, usa 'soma_morbidities').
+    Parâmetros:
+    - df: DataFrame original.
+    - prefixo: Prefixo das colunas a incluir.
+    - nome_coluna_soma: Nome da nova coluna de soma. Se None, será 'soma_' + prefixo.
 
-#     Retorna:
-#     - DataFrame com as morbidades processadas, incluindo:
-#       - 'Morbidades': lista de morbidades binárias e textuais.
-#       - 'other_morbidities': morbidades textuais normalizadas.
-#       - 'soma_morbidities': soma total de morbidades (binárias + textuais).
-#     """
+    Retorna:
+    - Novo DataFrame com as colunas selecionadas + coluna de soma.
+    """
+    # Filtra colunas com o prefixo
+    colunas = [col for col in df.columns if col.startswith(prefixo)]
 
-#     import re
-#     import numpy as np
-    
-#     morbidities_cols = list(morbidade_dict.keys())
-#     campos_para_propagacao = ['id_institution', 'uuidv5', 'full_name', 'elder_age']  
-    
-#     # Propaga os campos chave
-#     for campo in campos_para_propagacao:
-#         df[campo] = df[campo].ffill()
+    # Garante que os dados sejam numéricos
+    df_filtrado = df[colunas].apply(pd.to_numeric, errors='coerce')
 
-#     # Inclui linhas que tenham morbidades binárias OU outras textuais
-#     df_filtrado = df[df[morbidities_cols].eq(1).any(axis=1) | df['other_morbidities'].notna()].copy()
+    # Nome da nova coluna de soma
+    if nome_coluna_soma is None:
+        nome_coluna_soma = f'soma_{prefixo.rstrip("_")}'
 
-#     if nome_coluna_soma is None:
-#         nome_coluna_soma = 'soma_morbidities'
+    # Adiciona a soma por linha
+    df_filtrado[nome_coluna_soma] = df_filtrado.sum(axis=1, numeric_only=True)
 
-#     # Soma das morbidades binárias
-#     df_filtrado['soma_binarias'] = df_filtrado[morbidities_cols].sum(axis=1, numeric_only=True)
+    return df_filtrado
 
-#     def nomes_morbidades(row):
-#         return ', '.join([morbidade_dict[col] for col in morbidities_cols if row.get(col) == 1])
 
-#     df_filtrado['Morbidades'] = df_filtrado.apply(nomes_morbidades, axis=1)
-
-#     # Padroniza a coluna 'other_morbidities' (primeira letra maiúscula)
-#     df_filtrado['other_morbidities'] = (
-#         df_filtrado['other_morbidities']
-#         .astype(str)  # Garante que todos os valores sejam strings
-#         .str.lower()  # Coloca em minúsculas
-#         .replace('nan', '')  # Remove 'nan' (caso existam valores inválidos)
-#         .str.strip()  # Remove espaços extras
-#         .str.capitalize()  # Coloca a primeira letra maiúscula
-#     )
-    
-#     # Remove qualquer vírgula extra no início ou no final
-#     df_filtrado['other_morbidities'] = df_filtrado['other_morbidities'].str.lstrip(', ').str.rstrip(', ')
-
-#     # Função para contar morbidades textuais
-#     def contar_textuais(texto):
-#         if not texto:
-#             return 0
-        
-#         # Substitui " e " (com espaços) por vírgula para separar corretamente as palavras
-#         texto = re.sub(r'\s+e\s+', ', ', texto)
-        
-#         # Substitui ponto e vírgula por vírgula
-#         texto = texto.replace(';', ',')
-        
-#         # Divide a string usando vírgula, ponto e vírgula ou barra vertical como separadores
-#         itens = re.split(r'[;,|]', texto)
-        
-#         # Remove espaços extras e conta as palavras
-#         itens = [item.strip() for item in itens if item.strip()]
-        
-#         return len(itens)
-
-#     # Aplica a função para contar as morbidades textuais
-#     df_filtrado['soma_other'] = df_filtrado['other_morbidities'].apply(contar_textuais)
-    
-#     # Soma final das morbidades (binárias + textuais)
-#     df_filtrado[nome_coluna_soma] = df_filtrado['soma_binarias'] + df_filtrado['soma_other']
-    
-#     # Converte para int64 para garantir que a coluna soma seja do tipo inteiro
-#     df_filtrado[nome_coluna_soma] = df_filtrado[nome_coluna_soma].fillna(0).astype('int64')
-
-#     # Limpa colunas auxiliares
-#     df_filtrado = df_filtrado.drop(columns=['soma_binarias', 'soma_other'])
-
-#     # Agrupamento
-#     df_resultado = df_filtrado.groupby(['id_institution', 'uuidv5', 'full_name'], as_index=False).agg({
-#         'Morbidades': lambda x: ', '.join(sorted(set(', '.join(x).split(', ')))),
-#         'other_morbidities': lambda x: ', '.join(sorted(set(filter(None, map(str.strip, x))))),
-#         nome_coluna_soma: 'sum',  # Usando a soma do campo 'soma_morbidities' customizado
-#         'elder_age': 'first'  # Garantir que 'elder_age' seja agregada
-#     })
-
-#     # Converte 'elder_age' para int64
-#     df_resultado['elder_age'] = df_resultado['elder_age'].fillna(0).astype('int64')
-
-#     # Ordena as colunas conforme solicitado
-#     df_resultado = df_resultado[['id_institution', 'uuidv5', 'full_name', 'elder_age', 'Morbidades', 'other_morbidities', nome_coluna_soma]]
-
-#     # Organiza as linhas
-#     df_resultado = df_resultado.sort_values(by=['id_institution', 'uuidv5', 'full_name'])
-
-#     return df_resultado
+# ---------------------------------------
 
 
 def extrair_morbidades(df, morbidade_dict, nome_coluna_soma=None):
@@ -262,285 +236,6 @@ def extrair_morbidades(df, morbidade_dict, nome_coluna_soma=None):
 
     return df_resultado
 
-
-
-
-
-#def extrair_morbidades(df, morbidade_dict, nome_coluna_soma=None):
-#    import re
-#    import numpy as np
-#    
-#    """
-#    Filtra e retorna os dados de morbidades legíveis,
-#    agrupados por id_institution, full_name, cpf.
-#    A coluna 'other_morbidities' é normalizada (minúsculas, sem espaços),
-#    separando múltiplas entradas por vírgula, ponto e vírgula ou barra vertical.
-#    Soma final inclui morbidades binárias + textuais distintas.#
-
-#    Parâmetros:
-#    - df: DataFrame.
-#    - morbidade_dict: dict, mapeamento de código -> texto.
-#    - nome_coluna_soma: str, nome da coluna soma (Se None, usa 'soma_morbidities').#
-
-#    Retorna:
-#    - DataFrame com as morbidades processadas, incluindo:
-#      - 'Morbidades': lista de morbidades binárias e textuais.
-#      - 'other_morbidities': morbidades textuais normalizadas.
-#      - 'soma_morbidities': soma total de morbidades (binárias + textuais).
-#    """#
-
-#    morbidities_cols = list(morbidade_dict.keys())
-#    #df[morbidities_cols] = df[morbidities_cols].apply(pd.to_numeric, errors='coerce')#
-
-#    # Preenche campos chave para propagação de dados
-#    campos_para_propagacao = ['id_institution', 'full_name', 'cpf', 'elder_age']  
-#    for campo in campos_para_propagacao:
-#        df[campo] = df[campo].ffill()#
-
-#    # Inclui linhas que tenham morbidades binárias OU outras textuais
-#    df_filtrado = df[df[morbidities_cols].eq(1).any(axis=1) | df['other_morbidities'].notna()].copy()#
-
-#    if nome_coluna_soma is None:
-#        nome_coluna_soma = 'soma_morbidities'#
-
-#    # Soma das morbidades binárias
-#    df_filtrado['soma_binarias'] = df_filtrado[morbidities_cols].sum(axis=1, numeric_only=True)#
-
-#    def nomes_morbidades(row):
-#        return ', '.join([morbidade_dict[col] for col in morbidities_cols if row.get(col) == 1])#
-
-#    df_filtrado['Morbidades'] = df_filtrado.apply(nomes_morbidades, axis=1)#
-
-#    # Padroniza a coluna 'other_morbidities' 
-#    df_filtrado['other_morbidities'] = (
-#        df_filtrado['other_morbidities']
-#        .astype(str)  # Garante que todos os valores sejam strings
-#        .str.lower()  # Coloca em minúsculas
-#        .replace('nan', '')  # Remove 'nan' (caso existam valores inválidos)
-#        .str.strip()  # Remove espaços extras
-#        .str.capitalize()  # Coloca a primeira letra maiúscula
-#    )#
-
-#    # Agrupamento
-#    df_resultado = df_filtrado.groupby(['id_institution', 'full_name', 'cpf'], as_index=False).agg({
-#        'Morbidades': lambda x: ', '.join(sorted(set(', '.join(x).split(', ')))),
-#        'other_morbidities': lambda x: ', '.join(sorted(set(filter(None, map(str.strip, x))))),
-#        'soma_binarias': 'sum',
-#        'elder_age': 'first'  # Garantir que 'elder_age' seja agregada
-#    })#
-
-#    # Conta as morbidades textuais, com separadores: , ; |
-#    def contar_textuais(texto):
-#        if not texto:
-#            return 0
-#        # Remove qualquer vírgula extra no início ou no final do texto pela função lstrip(', ') 
-#        texto = texto.lstrip(', ').rstrip(', ')
-#        # Divide o texto por vírgula, ponto e vírgula ou barra vertical
-#        itens = re.split(r'[;,|]', texto)
-#        return len([item.strip() for item in itens if item.strip()])#
-
-#    df_resultado['soma_other'] = df_resultado['other_morbidities'].apply(contar_textuais)
-#    df_resultado[nome_coluna_soma] = df_resultado['soma_binarias'] + df_resultado['soma_other']#
-
-#    # Limpa colunas auxiliares
-#    df_resultado = df_resultado.drop(columns=['soma_binarias', 'soma_other'])#
-
-#    # Adiciona a coluna idade
-#    df_resultado = df_resultado[['id_institution', 'full_name', 'elder_age', 'cpf', 'Morbidades', 'other_morbidities', nome_coluna_soma]]#
-
-#    # Organiza as linhas
-#    df_resultado = df_resultado.sort_values(by=['id_institution', 'full_name', 'cpf'])#
-
-#    return df_resultado
-
-# def extrair_morbidades(df, morbidade_dict, nome_coluna_soma=None):
-#     """
-#     Filtra e retorna os dados de morbidades legíveis, agrupados por id_institution, full_name, cpf.
-#     A coluna 'other_morbidities' é normalizada (minúsculas, sem espaços),
-#     separando múltiplas entradas por vírgula, ponto e vírgula ou barra vertical.
-#     Soma final inclui morbidades binárias + textuais distintas.
-
-#     Parâmetros:
-#     - df: DataFrame.
-#     - morbidade_dict: dict, mapeamento de código -> texto.
-#     - nome_coluna_soma: str, nome da coluna soma (Se None, usa 'soma_morbidities').
-
-#     Retorna:
-#     - DataFrame com as morbidades processadas, incluindo:
-#       - 'Morbidades': lista de morbidades binárias e textuais.
-#       - 'other_morbidities': morbidades textuais normalizadas.
-#       - 'soma_morbidities': soma total de morbidades (binárias + textuais).
-#     """
-    
-#     morbidities_cols = list(morbidade_dict.keys())
-#     campos_para_propagacao = ['id_institution', 'uuidv5', 'full_name', 'elder_age']  # Incluir 'elder_age'
-    
-#     # Propaga os campos chave
-#     for campo in campos_para_propagacao:
-#         df[campo] = df[campo].ffill()
-
-#     # Inclui linhas que tenham morbidades binárias OU outras textuais
-#     df_filtrado = df[df[morbidities_cols].eq(1).any(axis=1) | df['other_morbidities'].notna()].copy()
-
-#     if nome_coluna_soma is None:
-#         nome_coluna_soma = 'soma_morbidities'
-
-#     # Soma das morbidades binárias
-#     df_filtrado['soma_binarias'] = df_filtrado[morbidities_cols].sum(axis=1, numeric_only=True)
-
-#     def nomes_morbidades(row):
-#         return ', '.join([morbidade_dict[col] for col in morbidities_cols if row.get(col) == 1])
-
-#     df_filtrado['Morbidades'] = df_filtrado.apply(nomes_morbidades, axis=1)
-
-#     # Padroniza a coluna 'other_morbidities' (primeira letra maiúscula)
-#     df_filtrado['other_morbidities'] = (
-#         df_filtrado['other_morbidities']
-#         .astype(str)  # Garante que todos os valores sejam strings
-#         .str.lower()  # Coloca em minúsculas
-#         .replace('nan', '')  # Remove 'nan' (caso existam valores inválidos)
-#         .str.strip()  # Remove espaços extras
-#         .str.capitalize()  # Coloca a primeira letra maiúscula
-#     )
-    
-#     # Remove qualquer vírgula extra no início ou no final
-#     df_filtrado['other_morbidities'] = df_filtrado['other_morbidities'].str.lstrip(', ').str.rstrip(', ')
-
-#     # Função para contar morbidades textuais
-#     def contar_textuais(texto):
-#         if not texto:
-#             return 0
-        
-#         # Substitui " e " (com espaços) por vírgula para separar corretamente as palavras
-#         texto = re.sub(r'\s+e\s+', ', ', texto)
-        
-#         # Substitui ponto e vírgula por vírgula
-#         texto = texto.replace(';', ',')
-        
-#         # Divide a string usando vírgula, ponto e vírgula ou barra vertical como separadores
-#         itens = re.split(r'[;,|]', texto)
-        
-#         # Remove espaços extras e conta as palavras
-#         itens = [item.strip() for item in itens if item.strip()]
-        
-#         return len(itens)
-
-#     # Aplica a função para contar as morbidades textuais
-#     df_filtrado['soma_other'] = df_filtrado['other_morbidities'].apply(contar_textuais)
-    
-#     # Soma final das morbidades (binárias + textuais)
-#     df_filtrado[nome_coluna_soma] = df_filtrado['soma_binarias'] + df_filtrado['soma_other']
-    
-#     # Converte para int64 para garantir que a coluna soma seja do tipo inteiro
-#     df_filtrado[nome_coluna_soma] = df_filtrado[nome_coluna_soma].fillna(0).astype('int64')
-
-#     # Limpa colunas auxiliares
-#     df_filtrado = df_filtrado.drop(columns=['soma_binarias', 'soma_other'])
-
-#     # Agrupamento
-#     df_resultado = df_filtrado.groupby(['id_institution', 'uuidv5', 'full_name'], as_index=False).agg({
-#         'Morbidades': lambda x: ', '.join(sorted(set(', '.join(x).split(', ')))),
-#         'other_morbidities': lambda x: ', '.join(sorted(set(filter(None, map(str.strip, x))))),
-#         nome_coluna_soma: 'sum',  # Usando a soma do campo 'soma_morbidities' customizado
-#         'elder_age': 'first'  # Garantir que 'elder_age' seja agregada
-#     })
-
-#     # Converte 'elder_age' para int64
-#     df_resultado['elder_age'] = df_resultado['elder_age'].fillna(0).astype('int64')
-
-#     # Ordena as colunas conforme solicitado
-#     df_resultado = df_resultado[['id_institution', 'uuidv5', 'full_name', 'elder_age', 'Morbidades', 'other_morbidities', nome_coluna_soma]]
-
-#     # Organiza as linhas
-#     df_resultado = df_resultado.sort_values(by=['id_institution', 'uuidv5', 'full_name'])
-
-#     return df_resultado
-
-# ----------------------------------------
-
-# def extrair_medicamentos(df):
-#     import pandas as pd
-#     """
-#     Extrai os medicamentos usados por residente, incluindo combinações, com colunas:
-#     med_name, dosage, taken_daily. Cada linha representa 1 medicamento.
-#     """
-#     tomadas_dia = {
-#         "1": "1 x ao dia",
-#         "2": "2 x ao dia",
-#         "3": "3 x ao dia",
-#         "4": "4 x ao dia",
-#         "5": "semanalmente",
-#         "6": "mensalmente",
-#         "7": "quinzenalmente"
-#     }
-
-#     # Filtra apenas registros do instrumento medicamentos_em_uso
-#     df_meds = df[df['redcap_repeat_instrument'] == 'medicamentos_em_uso'].copy()
-
-#     # Propaga os campos-chave
-#     campos_chave = ['id_institution', 'full_name', 'cpf']
-#     for campo in campos_chave:
-#         if df_meds[campo].dtype == object:
-#             df_meds[campo] = df_meds[campo].ffill().str.upper()
-#         else:
-#             df_meds[campo] = df_meds[campo].ffill()
-
-#     registros = []
-
-#     for _, row in df_meds.iterrows():
-#         base_info = {
-#             'id_institution': row['id_institution'],
-#             'full_name': row['full_name'],
-#             'cpf': row['cpf']
-#         }
-
-#         # Medicamento principal
-#         med_name = str(row.get('med_name')).strip().lower() if pd.notnull(row.get('med_name')) else None
-#         if med_name:
-#             valor_bruto = row.get('taken_daily')
-#             taken_daily = None
-#             if pd.notnull(valor_bruto):
-#                 chave = str(int(valor_bruto)) if not isinstance(valor_bruto, str) else valor_bruto.strip()
-#                 taken_daily = tomadas_dia.get(chave)
-
-#             registros.append({
-#                 **base_info,
-#                 'med_name': med_name,
-#                 'dosage': row.get('dosage'),
-#                 'taken_daily': taken_daily
-#             })
-
-#         # Combinações
-#         for i in range(1, 7):
-#             comb_col = f'combination_{i}'
-#             dose_col = f'combination_dosage_{i}'
-
-#             comb_value = row.get(comb_col)
-#             if pd.notnull(comb_value) and str(comb_value).strip():
-#                 registros.append({
-#                     **base_info,
-#                     'med_name': str(comb_value).strip().lower(),
-#                     'dosage': row.get(dose_col),
-#                     'taken_daily': None
-#                 })
-
-#     # Cria DataFrame final
-#     df_resultado = pd.DataFrame(registros)
-
-#     # Ordena para melhor leitura
-#     df_resultado = df_resultado.sort_values(by=['id_institution', 'full_name', 'cpf'])
-
-#     # Renomear colunas
-#     df_resultado = df_resultado.rename(columns={
-#         "id_institution": "ILPI",
-#         "full_name": "Nome Completo",	
-#         "cpf": "CPF",	
-#         "med_name": "Medicamento",	
-#         "dosage": "Dose",	
-#         "taken_daily": "Tomadas ao dia"
-#     })
-
-#     return df_resultado
 
 # ----------------------------------------
 

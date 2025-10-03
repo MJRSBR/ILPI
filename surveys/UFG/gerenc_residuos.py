@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
 from utils.utils import criar_diretorios
+from funcoes.f_process import processa_binario, processa_multiresposta
 from funcoes.f_plot import plot_config, salvar_tabela_como_imagem
 # %%
 # ------------------------------
@@ -35,10 +36,10 @@ df
 # ---------------------------
 # Separação do lixo (orgânico/reciclável)
 
-reciclagem_lixo = (df[["id_institution", "trash_recicling"]]
-                   .assign(df_filtered=df["trash_recicling"].map({1: "Sim", 2: "Não"}))
-                   [["id_institution", "df_filtered"]]
-                .rename(columns={"id_institution": "ILPI", "df_filtered": "Reciclagem_lixo"})
+reciclagem_lixo = processa_binario(df, 
+                                   'trash_recicling', 
+                                   'Reciclagem_lixo', 
+                                   {1: 'Sim', 2: 'Não'}
 )
 
 reciclagem_lixo
@@ -78,22 +79,15 @@ plt.show()
 # %%
 # Recipientes adequados e devidamente rotulados para descarte dos diferentes tipos de resíduos
 # ---------------------------
+container_adequados_cols = {
+    "trash_container___1" : 'Resíduo infectante', 
+    "trash_container___2" : 'Resíduo químico', 
+    "trash_container___3" : 'Resíduo radioativo', 
+    "trash_container___4" : 'Resíduo perfurocortante',
+    "trash_container___5" : 'Resíduo comum'
+}
 
-container_adequados = (df[["id_institution", "trash_container___1", "trash_container___2", "trash_container___3", 
-                           "trash_container___4","trash_container___5"]]
-                  .assign(
-                        container_adequados_list=(
-                              df["trash_container___1"].map(lambda x: 'Resíduo infectante' if x == 1 else '') +
-                              df["trash_container___2"].map(lambda x: ', Resíduo químico' if x == 1 else '') +
-                              df["trash_container___3"].map(lambda x: ', Resíduo radioativo' if x == 1 else '') +
-                              df["trash_container___4"].map(lambda x: ', Resíduo perfurocortante' if x == 1 else '') +
-                              df["trash_container___5"].map(lambda x: ', Resíduo comum' if x == 1 else '') 
-                        )
-                  )
-                  .assign(container_adequados_list=lambda x: x['container_adequados_list'].str.lstrip(', '))  # Limpar vírgula no início da string
-                  .rename(columns={"id_institution": "ILPI"})  # Renomeando a coluna
-                  [["ILPI", "container_adequados_list"]]  # Selecionando apenas as colunas finais
-)
+container_adequados = processa_multiresposta(df, container_adequados_cols, 'container_adequados_list')
 
 container_adequados
 # %%

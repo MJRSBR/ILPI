@@ -3,10 +3,13 @@ import sys
 sys.path.append('/Users/mjrs/Library/CloudStorage/OneDrive-Pessoal/UFG/Projeto_VIDAEPAUTA/Códigos/ILPI')
 
 # %%
-
+# %%
+# --------------------
+# Bibliotecas
+# --------------------
+import os
 import pandas as pd
 
-from utils.utils import criar_diretorios
 from funcoes.f_plot import plot_config, salvar_tabela_como_imagem, plot_bar_flex_unificado
 from funcoes.f_process import extrair_medicamentos
 # %%
@@ -17,15 +20,20 @@ from funcoes.f_process import extrair_medicamentos
 plot_config()
 
 # Cria diretórios para plots e tabelas
-criar_diretorios()
+os.makedirs('../../UFG/tables', exist_ok=True)
+os.makedirs('../../UFG/plots', exist_ok=True)
 # %%
 # ---------------------
 # Leitura dos dados
-# ---------------------
-df = pd.read_csv("../../../data/SMSAp/ILPI/base_perfil_epidemiologico.csv",
-                 sep=";")
-df.head()
-
+df = pd.read_csv('../../../data/UFG/base_ilpi.csv')
+df
+# %%
+# Renomeando a coluna institution_name para id_institution
+df.rename(columns={'institution_name':'id_institution'}, inplace=True)
+df
+# %%
+df.columns.tolist()
+# %%
 ## --------------------
 ## ----- 10 - Medicamentos
 ## --------------------

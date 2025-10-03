@@ -11,7 +11,8 @@ import seaborn as sns
 from matplotlib.ticker import MaxNLocator
 
 from utils.utils import criar_diretorios
-from funcoes.f_plot import plot_config, salvar_tabela_como_imagem
+from funcoes.f_process import processa_binario
+from funcoes.f_plot import plot_config, plot_barh, salvar_tabela_como_imagem
 # %%
 # ------------------------------
 # Carregando configuraçoes e utilitários
@@ -35,12 +36,11 @@ df
 # Medicamentos dentro do prazo de validade
 # -------------------
 
-medic_prazo_val = (df[['id_institution', 'medication_val_date']]
-                        .assign(df_filtered=df['medication_val_date'].map({1: 'Sim', 2: 'Não'}))  # Mapeando 'residents_bedroom'
-                        [['id_institution', 'df_filtered']]  # Selecionando as colunas necessárias
-                        .rename(columns={'id_institution': 'ILPI', 'df_filtered': 'Medicamentos_dentro_prazo_validade'})  # Renomeando as colunas
+medic_prazo_val = processa_binario(df,
+                                   'medication_val_date', 
+                                   'Medicamento_dentro_prazo_validade',
+                                   {1: 'Sim', 2:'Não'}
 )
-
 # Exibindo o resultado
 medic_prazo_val
 # %%
@@ -52,19 +52,11 @@ salvar_tabela_como_imagem(
 # %%
 # Gráfico 20 - Medicamento dentro do prazo de validade
 
-#medic_prazo_val_counts = medic_prazo_val["Medicacao_prazo_validade"].value_counts()
-#
-#plot_barh(
-#    medic_prazo_val,
-#    "Medicamento dentro do prazo de validade",
-#    "ILPIs",
-#    "18_medic_prazo.png"
-#)
-# Tamanho da figura
+#Tamanho da figura
 plt.figure(figsize=(10, 6))
 
 # Agrupar e plotar o gráfico de barras horizontais
-medic_prazo_val.groupby('Medicamentos_dentro_prazo_validade').size().plot(
+medic_prazo_val.groupby('Medicamento_dentro_prazo_validade').size().plot(
     kind='barh',
     color=['#4E79A7', '#F28E2B']
 )
@@ -90,10 +82,10 @@ plt.show()
 # ---------------------
 # Embalagem violada
 
-emb_viol = (df[["id_institution", "violeted_pakage"]]
-            .assign(df_filtered=df["violeted_pakage"].map({1: "Sim", 2:"Não"}))
-            [["id_institution", "df_filtered"]]
-            .rename(columns={"id_institution": "ILPI", "df_filtered": "Embalagem_violada"})
+emb_viol = processa_binario(df, 
+                            'violeted_pakage', 
+                            'Embalagem_violada', 
+                            {1: 'Sim', 2: 'Não'}
 )
 emb_viol
 # %%
@@ -105,14 +97,6 @@ salvar_tabela_como_imagem(
 # %%
 # -------------------
 # Gráfico 21 - Medicamento com embalagem violada
-
-#emb_viol_counts = emb_viol["Embalagem_violada"].value_counts()
-#
-#plot_barh(
-#    emb_viol,
-#    "Medicamento com embalagem violada",
-#    "19_medic_emb_violada.png"
-#)
 # Tamanho da figura
 plt.figure(figsize=(10, 6))
 
@@ -142,10 +126,10 @@ plt.show()
 # ------------------
 # Geladeira exclusiva ao armazenamento de medicamentos
 
-geladeira_medic = (df[['id_institution', 'medicine_refrigerator']]
-                   .assign(df_filtered=df["medicine_refrigerator"].map({1: "Sim", 2: "Não"}))
-                   [["id_institution", "df_filtered"]]
-                   .rename(columns={"id_institution": "ILPI", "df_filtered": "Geladeira_exclusiva_medicamentos"})
+geladeira_medic =  processa_binario(df,
+                     'medicine_refrigerator', 
+                     'Geladeira_exclusiva_medicamentos', 
+                     {1: 'Sim', 2: 'Não'}
 )
 
 geladeira_medic
@@ -159,13 +143,6 @@ salvar_tabela_como_imagem(
 # ------------------
 # Gráfico 22 - Geladeira exclusiva ao armazenamento de medicamentos
 
-#geladeira_medic_counts = geladeira_medic["Geladeira_exclusiva_medicamentos"].value_counts#()
-#
-#plot_barh(
-#    geladeira_medic,
-#    "Geladeira exclusiva ao armazenamento de medicamentos",
-#    "20_geladeira_medic.png"
-#)
 # Tamanho da figura
 plt.figure(figsize=(10, 6))
 
@@ -195,10 +172,10 @@ plt.show()
 # ----------------------
 # Registro temperatura da geladeira
 
-reg_temp_geladeira = (df[["id_institution", "refrigerator_temp_log"]]
-             .assign(df_filtered=df["refrigerator_temp_log"].map({1: "Sim", 2: "Não"}))
-             [["id_institution", "df_filtered"]]
-             .rename(columns={"id_institution": "ILPI", "df_filtered": "Registro_temperatura_geladeira"})
+reg_temp_geladeira = processa_binario(df, 
+                                      'refrigerator_temp_log', 
+                                      'Registro_temperatura_geladeira', 
+                                      {1: 'Sim', 2: 'Não'}
 )
 
 reg_temp_geladeira
@@ -248,10 +225,10 @@ plt.show()
 # ----------------------
 # Registro de utilização e frequência uso medicação
 
-reg_medic = (df[["id_institution", "medication_register"]]
-             .assign(df_filtered=df["medication_register"].map({1: "Sim", 2: "Não"}))
-             [["id_institution", "df_filtered"]]
-             .rename(columns={"id_institution": "ILPI", "df_filtered": "Registro_uso_medicamentos"})
+reg_medic = processa_binario(df, 
+                             'medication_register', 
+                             'Registro_uso_medicacao', 
+                             {1: 'Sim', 2: 'Não'}
 )
 
 reg_medic
@@ -275,7 +252,7 @@ salvar_tabela_como_imagem(
 plt.figure(figsize=(10, 6))
 
 # Agrupar e plotar o gráfico de barras horizontais
-reg_medic.groupby('Registro_uso_medicamentos').size().plot(
+reg_medic.groupby('Registro_uso_medicacao').size().plot(
     kind='barh',
     color=['#4E79A7', '#F28E2B']
 )
@@ -312,6 +289,15 @@ tipo_reg_medic = (df[["id_institution", "medication_register_type___1", "medicat
                   .rename(columns={"id_institution": "ILPI"})  # Renomeando a coluna
                   [["ILPI", "tipo_reg_medic_list"]]  # Selecionando apenas as colunas finais
 )
+# %%
+from funcoes.f_process import processa_multiresposta
+tipo_reg_medic_cols = {
+    "medication_register_type___1" : 'Livro ata', 
+    "medication_register_type___2" : 'Registro individual em papel',
+    "medication_register_type___3" : 'Registro individual digital'
+}
+
+tipo_reg_medic = processa_multiresposta(df, tipo_reg_medic_cols, 'Tipo_registro_medicacao')
 
 tipo_reg_medic
 # %%
@@ -328,7 +314,7 @@ salvar_tabela_como_imagem(
 plt.figure(figsize=(10, 6))
 
 # Agrupar e plotar o gráfico de barras horizontais
-tipo_reg_medic.groupby('tipo_reg_medic_list').size().plot(
+tipo_reg_medic.groupby('Tipo_registro_medicacao').size().plot(
     kind='barh',
     color=sns.palettes.mpl_palette('Dark2')
 )
@@ -353,10 +339,10 @@ plt.show()
 # -------------------------
 # Substâncias Psicoativas/Psicotrópicas estão guardadas separadamente
 
-med_psico_separado = (df[["id_institution", "psico_drugs_segregation"]]
-             .assign(df_filtered=df["psico_drugs_segregation"].map({1: "Sim", 2: "Não"}))
-             [["id_institution", "df_filtered"]]
-             .rename(columns={"id_institution": "ILPI", "df_filtered": "Subst_psico_segregada"})
+med_psico_separado = processa_binario(df, 
+                                      'psico_drugs_segregation', 
+                                      'Subst_psico_segregada', 
+                                      {1: 'Sim', 2: 'Não'}
 )
 
 med_psico_separado
@@ -522,7 +508,7 @@ salvar_tabela_como_imagem(
 )
 # %%
 # -------------------------
-# Gráfico 27 - Outro profissional dispensa medicamento
+# Gráfico 29 - Outro profissional dispensa medicamento
 
 plt.figure(figsize=(10, 6))
 
