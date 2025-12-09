@@ -100,6 +100,15 @@ df_idade = df[['id_institution', 'elder_age']]
 # Filtra apenas as linhas com idade dos residentes
 df_idade = df_idade[df_idade['elder_age'].notna()].astype({'elder_age': 'int64'})
 df_idade.head()
+
+# %%
+
+df_idade_60_mais = df_idade[df_idade['elder_age']>=60].reset_index()
+df_idade_60_mais
+# %%
+df_idade_60_menos = df_idade[df_idade['elder_age']<=60].reset_index()
+df_idade_60_menos
+
 # %%
 ## ----- Plotando a idade dos residentes com linha de média
 
@@ -182,6 +191,8 @@ idade.head()
 # Define os intervalos de idade para as categorias
 
 elder_age_bins = {
+    '51 a 55 anos': (50, 55),
+    '56 a 60 anos': (55, 60),
     '61 a 65 anos': (60, 65),
     '66 a 70 anos': (65, 70),
     '71 a 75 anos': (70, 75),
@@ -193,7 +204,7 @@ elder_age_bins = {
 }
 
 # Gera a lista de bins e labels
-bins = [60] + [v[1] for v in elder_age_bins.values()]
+bins = [50] + [v[1] for v in elder_age_bins.values()]
 labels = list(elder_age_bins.keys())
 
 # Cópia do data frame para criar novo data frame
@@ -224,7 +235,7 @@ idade_count
 salvar_tabela_como_imagem(
     idade_count,
     '../tables/02_tabela_faixa_idade.png',
-    largura_max_coluna=25
+
 )
 # %%
 

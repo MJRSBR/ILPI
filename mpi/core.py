@@ -6,7 +6,7 @@ __version__ = '0.0.1'
 
 import numpy as np
 import pandas as pd
-from .utils import _safe_col
+from utils import _safe_col
 
 # %%
 
@@ -254,3 +254,5 @@ def aplicar_brief_mpi(df, keep_raw=False):
     return out[final_cols]
 
 
+
+# %%

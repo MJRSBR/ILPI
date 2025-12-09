@@ -191,7 +191,7 @@ def limpar_e_converter_colunas(df: pd.DataFrame, colunas_tipos: dict) -> pd.Data
 # Lendo o arquivo .csv do REDCap
 # --------------------
 # 
-df = pd.read_csv("../../../../data/SMSAp/ILPI/PerfilEpidemiolgicos_DATA_2025-09-17_1151.csv",
+df = pd.read_csv("../data/SMSAp/ILPI/PerfilEpidemiolgicos_DATA_2025-09-17_1151.csv",
                  sep=";")
 df.head()
 
@@ -285,7 +285,7 @@ df_ilpi
 
 # %%
 
-df_ilpi.to_csv("../../../../data/SMSAp/ILPI/base_perfil_epidemiologico.csv",
+df_ilpi.to_csv("../data/SMSAp/ILPI/base_perfil_epidemiologico.csv",
                    index=False,
                    sep=";")
 print("✅ Arquivo Base Perfil Epidemiológico Residente salvo!!" )

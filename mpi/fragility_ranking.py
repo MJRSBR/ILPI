@@ -3,7 +3,7 @@
 # Leitura dos dados
 # ---------------------
 import sys
-sys.path.append('/Users/mjrs/Library/CloudStorage/OneDrive-Pessoal/UFG/Projeto_VIDAEPAUTA/Códigos/ILPI')
+sys.path.append('/Users/mjrs/Documents/ILPI')
 
 import pandas as pd
 
@@ -47,7 +47,7 @@ salvar_tabela_como_imagem(
     top_score[["id_institution", "uuidv5", "full_name", "MPI", "risk"]],
     'Top20ScoreFragilidade.png',
     titulo='Top 20 Score de Fragilidade do Residente por ILPI',
-    largura_max_coluna=70
+    largura_total_max=180
 )
 # %%
 ## --------------------
@@ -60,6 +60,7 @@ resultado
 
 # %%
 resumo.sort_values(by="total", ascending=False)
+
 # %%
 
 from IPython.display import display, HTML
@@ -76,6 +77,6 @@ salvar_tabela_como_imagem(
     resumo,
     'Tabela_resumo_score_fragilidade.png',
     titulo='Score de Fragilidade do Residente por ILPI',
-    largura_max_coluna=25
+    largura_total_max=100
 )
 # %%
